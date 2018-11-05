@@ -1,12 +1,27 @@
-# STUSB4500
+# STUSB4500 SW drivers and tools (USB Power Delivery)
 Autonomous USB-PD controller for Power Sinks / UFP (i.e. on the Devices side) <br/>
-Certified by USB-IF for USB Type-C and USB Power Delivery applications. <br/>
+Certified by USB-IF consortium for USB Type-C and USB Power Delivery applications. <br/>
 
 ## Application summary
 By default the USB-C specification only provide 5V from a USB-PD Power Source (Host / DFP) <br/>
 This product enables to automatically negociate to the Source a higher Voltage (>5V) up to 100W. <br/>
+For instance, if the Power brick can provide 3 power profiles (5V, 9V and 15V) then the STUSB4500 will request the highest voltage available (15V). <br/>
+This part can be easily implemented in a battery charger with USB-C input in the application.
 
-For instance, if the Power brick can provide 3 power profiles (5V, 9V and 15V) then the STUSB4500 will request the highest voltage available (15V).
+The device doesn't need any software to run (it is automous). But it is possible to connect to this device by I2C to take control over the default device behavior, or to get the power information (Voltage/Current) of the attached power source at the other side of the cable. This is what is showed in the demo source of the project's repository.
+
+Info:
+----------------
+* __Device:__       STUSB4500 > USB PD controller  <br />
+* __Manufacturer:__ STMicroelectronics
+* __USB power role:__ UFP (Power Sink side)
+* __USB data  role:__ independant (works with USB Host or Device - can be USB2.0 or USB3.1 or No data)
+* __Typical Application:__ To Get automatically higher power on Vbus at the insertion of USB-C cable.
+* __Features:__ Autonomous, configurable, easy to use, small footprint <br />
+* __Operating supply:__ 5V to 20V directly from Vbus of the USB-C cable. <br /> Or a lower power (3.3V) for battery supplied applications <br />
+* __Package:__ QFN-24, WLCSP MSL1 <br />
+* __Part number:__ STUSB4500QTR, STUSB4500BJR
+* __Spec:__ USB-C v1.2 , USB PD v2.0 & v3.0
 
 ## Presentation
 The STUSB4500 is a USB power delivery controller that addresses sink devices. It implements a proprietary algorithm to allow the negotiation of a power delivery contract with a source without MCU support (auto-run mode). PDO profiles are configured in an integrated non-volatile memory. <br/>
