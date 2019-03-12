@@ -1,7 +1,7 @@
 # STSW-STUSB002
 Graphical User Interface for STUSB4500
 
-![Screenshot GUI](https://github.com/usb-c/STUSB4500/blob/master/GUI/Pics/STUSB4500_GUI_1.08_offline_screenshot.png)
+![Screenshot GUI](https://raw.githubusercontent.com/usb-c/STUSB4500/master/GUI/Pics/STUSB4500_GUI_1.08_offline_screenshot.png)
 
 ## Presentation
 
