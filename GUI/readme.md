@@ -23,5 +23,9 @@ The software can be used with the evaluation boards from the STUSB devices stack
 <!---
 ![Screenshot2 GUI](https://github.com/usb-c/STUSB4500/blob/master/GUI/Pics/STUSB4500_GUI_1.08_online_screenshot.png)
 --->
-
+<!---
 <img src="https://github.com/usb-c/STUSB4500/blob/master/GUI/Pics/STUSB4500_GUI_1.08_online_screenshot.png" height="400">
+--->
+
+<img src="https://raw.githubusercontent.com/usb-c/STUSB4500/master/GUI/Pics/STUSB4500_GUI_1.08_online_screenshot.png" height="500">
+
