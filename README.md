@@ -52,10 +52,18 @@ Thanks to its 20 V technology, it implements high voltage features to protect th
 * Interoperable with USB PD rev 3.0
 
 
-## NVM programming
+## Programming
+
+### Register Programming
+The USB-PD chip has 148 registers (0x94).  <br/>
+Use the firmware example contained in this repository (STSW-STUSB003 Software library for STUSB4500) to control the STUSB4500 with a Micro-controller, and take control over the default behavior of the device.
+You can for instance with the MCU request any PDO that you want from the DFP (you are no more limited to 3 PDOs).
+
+### NVM programming
 The chip can be used in standalone with a custom configuration thanks to its internal memory.  <br/>
 The Non-Volatile Memory (NVM) contains the STUSB4500 configuration which load automatically at power-up.  <br/>
-But the NVM memory is not directly accessible byte per byte. It has to be accessed by block, following a specific sequence.
+But the NVM memory is not directly accessible byte per byte. It has to be accessed by block, following a specific sequence.  <br/>
+The NVM size is 40 bytes.  <br/>
 
 The NVM programming is done through I2C. <br/>
 You can program the chip during manufacturing with any standard programming tool, as long as the tool has access to the I2C interface.
@@ -70,3 +78,19 @@ Here are the steps to program the NVM memory:
 1. With the GUI, generate the NVM config file (.h) which contains the binary configuration of STUSB45
 1. Use the STUSB_NVM_Library source code to write the binary configuration (.h) into the chip NVM memory
 1. Reset the chip so that it reloads its latest NVM configuration
+
+
+## Evaluation Board
+There are different boards available to test the product.
+
+* STUSB4500 evaluation board : STEVAL-ISC005V1   <br/>
+https://www.st.com/content/st_com/en/products/evaluation-tools/solution-evaluation-tools/psu-and-converter-solution-eval-boards/steval-isc005v1.html
+
+  * Note : This board requires to be connected on top of a STM32 Nucleo board : NUCLEO-F072RB or NUCLEO-G071RB <br/>
+https://www.st.com/en/evaluation-tools/nucleo-f072rb.html <br/>
+https://www.st.com/en/evaluation-tools/nucleo-g071rb.html <br/>
+
+* STUSB4500 reference design : STREF-SCS001V1   <br/>
+https://www.st.com/content/st_com/en/products/evaluation-tools/solution-evaluation-tools/psu-and-converter-solution-eval-boards/stref-scs001v1.html
+
+
