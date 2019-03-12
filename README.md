@@ -74,7 +74,7 @@ You can request the NVM Library by contacting the manufacturer online support : 
 
 
 Here are the steps to program the NVM memory:
-1. Use the STSW-STUSB002 GUI to configure the STUSB4500 according to your application needs (PDO, Voltage, …)
+1. Use the STSW-STUSB002 GUI to configure the STUSB4500 according to your application needs (PDO, Voltage, Current, Overvoltage protection, …)
 1. With the GUI, generate the NVM config file (.h) which contains the binary configuration of STUSB45
 1. Use the STUSB_NVM_Library source code to write the binary configuration (.h) into the chip NVM memory
 1. Reset the chip so that it reloads its latest NVM configuration
@@ -90,7 +90,23 @@ https://www.st.com/content/st_com/en/products/evaluation-tools/solution-evaluati
 https://www.st.com/en/evaluation-tools/nucleo-f072rb.html <br/>
 https://www.st.com/en/evaluation-tools/nucleo-g071rb.html <br/>
 
+<p align="center">
+<img src="https://raw.githubusercontent.com/usb-c/STUSB4500/master/Pics/en.steval-isc005v1_image.jpg" width="200">
+
+<img src="https://raw.githubusercontent.com/usb-c/STUSB4500/master/Pics/en.nucleo-G0.jpg" width="200">
+</p>
+
 * STUSB4500 reference design : STREF-SCS001V1   <br/>
 https://www.st.com/content/st_com/en/products/evaluation-tools/solution-evaluation-tools/psu-and-converter-solution-eval-boards/stref-scs001v1.html
 
+<p align="center">
+<img src="https://raw.githubusercontent.com/usb-c/STUSB4500/master/Pics/en.stref-scs001v1_image.JPG" width="200">
+</p>
+
+* Nano USB PD to DC Module : CG-NANOPDDC   <br/>
+https://www.coolgear.com/product/nano-usb-pd-to-dc-module-pd-negotiation-device
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/usb-c/STUSB4500/master/Pics/mini-pd-profile-tester5x1000.jpg" width="200">
+</p>
 
