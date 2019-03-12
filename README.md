@@ -50,3 +50,23 @@ Thanks to its 20 V technology, it implements high voltage features to protect th
   * USB Type-C™ rev 1.2
   * USB PD rev 2.0 (Official Test ID: TID #1000133)
 * Interoperable with USB PD rev 3.0
+
+
+## NVM programming
+The chip can be used in standalone with a custom configuration thanks to its internal memory.  <br/>
+The Non-Volatile Memory (NVM) contains the STUSB4500 configuration which load automatically at power-up.  <br/>
+But the NVM memory is not directly accessible byte per byte. It has to be accessed by block, following a specific sequence.
+
+The NVM programming is done through I2C. <br/>
+You can program the chip during manufacturing with any standard programming tool, as long as the tool has access to the I2C interface.
+
+Note that STSW-STUSB003 Software Library is only used to manage the standard registers of STUSB4500, but not the NVM registers block.  <br/>
+If you want to program the NVM memory, it is needed to use the STUSB_NVM_Library project.  <br/>
+You can request the NVM Library by contacting the manufacturer online support : https://my.st.com/ols
+
+
+Here are the steps to program the NVM memory:
+1. Use the STSW-STUSB002 GUI to configure the STUSB4500 according to your application needs (PDO, Voltage, …)
+1. With the GUI, generate the NVM config file (.h) which contains the binary configuration of STUSB45
+1. Use the STUSB_NVM_Library source code to write the binary configuration (.h) into the chip NVM memory
+1. Reset the chip so that it reloads its latest NVM configuration
