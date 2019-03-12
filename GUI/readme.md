@@ -1,6 +1,8 @@
 # STSW-STUSB002
 Graphical User Interface for STUSB4500
 
+![Screenshot GUI](https://github.com/usb-c/STUSB4500/blob/master/GUI/Pics/STUSB4500_GUI_1.08_offline_screenshot.png)
+
 ## Presentation
 
 The STSW-STUSB002 is a free graphical interface (GUI) aimed at customizing seamlessly the STUSB devices through direct access to non-volatile-memory (NVM). <br/>
@@ -15,5 +17,11 @@ The software can be used with the evaluation boards from the STUSB devices stack
 ## Key Features
 * Access to the STUSB non-volatile-memory
 * Read and write any I2C register address
-* Device dashboard
+* Device dashboard (to see chip status in real time)
 * Operating system required: Microsoft Windows 7, 8.1, 10
+
+<!---
+![Screenshot2 GUI](https://github.com/usb-c/STUSB4500/blob/master/GUI/Pics/STUSB4500_GUI_1.08_online_screenshot.png)
+--->
+
+<img src="https://github.com/usb-c/STUSB4500/blob/master/GUI/Pics/STUSB4500_GUI_1.08_online_screenshot.png" height="400">
