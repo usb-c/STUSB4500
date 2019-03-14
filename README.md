@@ -110,6 +110,22 @@ https://www.coolgear.com/product/nano-usb-pd-to-dc-module-pd-negotiation-device
 <img src="https://raw.githubusercontent.com/usb-c/STUSB4500/master/Pics/mini-pd-profile-tester5x1000.jpg" width="200">
 </p>
 
+
+## More
+
+<p align="center">
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=pFOu_4AzVVg
+" target="_blank"><img src="http://img.youtube.com/vi/pFOu_4AzVVg/0.jpg" 
+alt="IMAGE ALT TEXT HERE" width="350" border="10" /></a>
+   <a href="http://www.youtube.com/watch?feature=player_embedded&v=Sld2pj-_ho0
+" target="_blank"><img src="http://img.youtube.com/vi/Sld2pj-_ho0/0.jpg" 
+alt="IMAGE ALT TEXT HERE" width="350" border="10" /></a>
+</p>
+
+<!---
+[![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/YOUTUBE_VIDEO_ID_HERE/0.jpg)](http://www.youtube.com/watch?v=YOUTUBE_VIDEO_ID_HERE)
+--->
+
 ## Notes
 The STUSB45 is a standalone USB-C PD controller for UFP only (Power SINK). <br/>
 It's counter part for DFP only (Power SOURCE) is STUSB47. <br/>
