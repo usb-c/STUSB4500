@@ -1,6 +1,6 @@
 # STUSB4500 SW drivers and tools (USB Power Delivery)
-Autonomous USB-PD controller for Power Sinks / UFP (i.e. on the Devices side) <br/>
-Certified by USB-IF consortium for USB Type-C and USB Power Delivery applications. <br/>
+Autonomous USB-C PD controller for Power Sinks / UFP (i.e. on the Devices side) <br/>
+Certified by USB-IF consortium for USB Type-C and USB Power Delivery applications (USB-C & USB PD). <br/>
 
 ## Application summary
 By default the USB-C specification only provide 5V from a USB-PD Power Source (Host / DFP) <br/>
@@ -109,4 +109,19 @@ https://www.coolgear.com/product/nano-usb-pd-to-dc-module-pd-negotiation-device
 <p align="center">
 <img src="https://raw.githubusercontent.com/usb-c/STUSB4500/master/Pics/mini-pd-profile-tester5x1000.jpg" width="200">
 </p>
+
+## Notes
+The STUSB45 is a standalone USB-C PD controller for UFP only (Power SINK). <br/>
+It's counter part for DFP only (Power SOURCE) is STUSB47. <br/>
+But as these 2 devices has been certified by USB-IF, it mean they are interoperable with any USB-C PD application. <br/>
+Plenty scenarios are possible, for instance:  <br/>
+
+| Source ctrl   | USB-C cable   |  Sink ctrl |
+|-----------|:---------------:|----------:|
+| STUSB47x0 |   <---------->  |   STUSB45 |
+| STUSB1600 |   <---------->  |   STUSB45 |
+| STUSB1602 |   <---------->  |   STUSB45 |
+| STM32G0xx |   <---------->  |   STUSB45 |
+| STM32MP1 |   <---------->  |   STUSB45 |
+
 
