@@ -5,10 +5,11 @@ Certified by USB-IF consortium for USB Type-C and USB Power Delivery application
 ## Application summary
 By default the USB-C specification only provide 5V from a USB-PD Power Source (Host / DFP) <br/>
 This product enables to automatically negociate to the Source a higher Voltage (>5V) up to 100W. <br/>
-For instance, if the Power brick can provide 3 power profiles (5V, 9V and 15V) then the STUSB4500 will request the highest voltage available (15V). <br/>
+For instance, if the Power brick can provide 4 power profiles (5V, 9V, 15V and 20V), then the STUSB4500 will request the highest voltage available (20V). <br/>
+Another example, if the Power brick can provide 4 power profiles (5V, 9V, 15V and 20V) but the Application needs 9V to boot, then the STUSB4500 can be programmed to always request 9V. <br/>
 This part can be easily implemented in a battery charger with USB-C input in the application.
 
-The device doesn't need any software to run (it is automous). But it is possible to connect to this device by I2C to take control over the default device behavior, or to get the power information (Voltage/Current) of the attached power source at the other side of the cable. This is what is showed in the demo source of the project's repository.
+The device doesn't need any software to run (it is automous). But it is possible to connect to this device by I2C to take control over the default device behavior, or to get the power information (Voltage/Current) of the attached power source at the other side of the cable. This is what is showed in the demo source code of the project's repository.
 
 Info:
 ----------------
