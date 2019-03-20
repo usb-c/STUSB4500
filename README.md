@@ -12,7 +12,7 @@ The device doesn't need any software to run (it is automous). But it is possible
 
 Info:
 ----------------
-* __Device:__       STUSB4500 > USB PD controller  <br />
+* __Device:__       STUSB4500 -> USB PD controller  <br />
 * __Manufacturer:__ STMicroelectronics
 * __USB power role:__ UFP (Power Sink side)
 * __USB data  role:__ independant (works with USB Host or Device - can be USB2.0 or USB3.1 or No data)
@@ -67,10 +67,6 @@ The NVM size is 40 bytes.  <br/>
 
 The NVM programming is done through I2C. <br/>
 You can program the chip during manufacturing with any standard programming tool, as long as the tool has access to the I2C interface.
-
-Note that STSW-STUSB003 Software Library is only used to manage the standard registers of STUSB4500, but not the NVM registers block.  <br/>
-If you want to program the NVM memory, it is needed to use the STUSB_NVM_Library project.  <br/>
-You can request the NVM Library by contacting the manufacturer online support : https://my.st.com/ols
 
 
 Here are the steps to program the NVM memory:
@@ -138,6 +134,7 @@ Plenty scenarios are possible, for instance:  <br/>
 | STUSB1600 |   <---------->  |   STUSB45 |
 | STUSB1602 |   <---------->  |   STUSB45 |
 | STM32G0xx |   <---------->  |   STUSB45 |
-| STM32MP1 |   <---------->  |   STUSB45 |
+| STUSB47x0 |   <---------->  | STM32Fx + STUSB45 |
+| STUSB47x0 |   <---------->  | STM32MP1 + STUSB45 |
 
 
