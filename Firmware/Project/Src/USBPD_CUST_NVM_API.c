@@ -1,12 +1,16 @@
 #include "i2c.h"
 #include "STUSB_NVM.h"
-#include "USB_PD_defines_STUSB-GEN1.h"
+#include "USB_PD_defines_STUSB-GEN1S.h"
 
 extern I2C_HandleTypeDef *hi2c[2];	
 extern unsigned int I2cDeviceID_7bit;
 extern unsigned int Address;
 extern unsigned int AddressSize ;
 
+#define STUSB4500_I2C_DEVID_7BIT  0x28
+#define STUSB4500_I2C_DEVID_8BIT  0x50
+#define I2C_Write_USB_PD(a,b,c,d) I2C_Write_USB_PD(a,STUSB4500_I2C_DEVID_7BIT, b,c,d)
+#define I2C_Read_USB_PD(a,b,c,d) I2C_Read_USB_PD(a,STUSB4500_I2C_DEVID_7BIT, b,c,d)
 
 void nvm_flash(uint8_t Port);
 void CUST_EnterWriteMode(uint8_t Port,unsigned char ErasedSector);
@@ -49,7 +53,7 @@ o 111 = Soft program sector 0 to 4 (depending upon the value which has been prog
 
 void CUST_EnterWriteMode(uint8_t Port,unsigned char ErasedSector)
 {
-	unsigned char Buffer[10];
+	unsigned char Buffer[2];
 
 	Buffer[0]=FTP_CUST_PASSWORD;   /* Set Password*/
 	I2C_Write_USB_PD(Port,FTP_CUST_PASSWORD_REG,Buffer,1);
@@ -57,9 +61,17 @@ void CUST_EnterWriteMode(uint8_t Port,unsigned char ErasedSector)
 	Buffer[0]= 0 ;   /* this register must be NULL for Partial Erase feature */
 	I2C_Write_USB_PD(Port,RW_BUFFER,Buffer,1);
 
-
-	Buffer[0]=FTP_CUST_PWR | FTP_CUST_RST_N; /* Set PWR and RST_N bits */
-	I2C_Write_USB_PD(Port,FTP_CTRL_0,Buffer,1);
+	{  
+		//NVM Power-up Sequence
+		//After STUSB start-up sequence, the NVM is powered off.
+        
+		Buffer[0]=0;  /* NVM internal controller reset */
+		I2C_Write_USB_PD(Port,FTP_CTRL_0,Buffer,1);
+        
+		Buffer[0]=FTP_CUST_PWR | FTP_CUST_RST_N; /* Set PWR and RST_N bits */
+		I2C_Write_USB_PD(Port,FTP_CTRL_0,Buffer,1);
+	}
+        
 	Buffer[0]=((ErasedSector << 3) & FTP_CUST_SER) | ( WRITE_SER & FTP_CUST_OPCODE) ;  /* Load 0xF1 to erase all sectors of FTP and Write SER Opcode */
 	I2C_Write_USB_PD(Port,FTP_CTRL_1,Buffer,1); /* Set Write SER Opcode */
 
@@ -99,20 +111,28 @@ void CUST_EnterWriteMode(uint8_t Port,unsigned char ErasedSector)
 
 void CUST_EnterReadMode(uint8_t Port)
 {
-	unsigned char Buffer[10];
+	unsigned char Buffer[2];
 
 	Buffer[0]=FTP_CUST_PASSWORD;  /* Set Password*/
 	I2C_Write_USB_PD(Port,FTP_CUST_PASSWORD_REG,Buffer,1);
-
+    
+	{  
+		//NVM Power-up Sequence
+		//After STUSB start-up sequence, the NVM is powered off.
+        
+		Buffer[0]=0;  /* NVM internal controller reset */
+		I2C_Write_USB_PD(Port,FTP_CTRL_0,Buffer,1);
+        
+		Buffer[0]=FTP_CUST_PWR | FTP_CUST_RST_N; /* Set PWR and RST_N bits */
+		I2C_Write_USB_PD(Port,FTP_CTRL_0,Buffer,1);
+	}
 }
 
 void CUST_ReadSector(uint8_t Port,char SectorNum, unsigned char *SectorData)
 {
-	unsigned char Buffer[10];
+	unsigned char Buffer[2];
 
-
-	
-	Buffer[0]= (SectorNum & FTP_CUST_SECT) | FTP_CUST_PWR |FTP_CUST_RST_N ;
+	Buffer[0]= FTP_CUST_PWR | FTP_CUST_RST_N; /* Set PWR and RST_N bits */
 	I2C_Write_USB_PD(Port,FTP_CTRL_0,Buffer,1);
 
 	Buffer[0]= (READ & FTP_CUST_OPCODE);
@@ -124,9 +144,10 @@ void CUST_ReadSector(uint8_t Port,char SectorNum, unsigned char *SectorData)
 	I2C_Read_USB_PD(Port,FTP_CTRL_0,Buffer,1); /* Wait for execution */
 	}
 	while(Buffer[0] & FTP_CUST_REQ);
+	
 	I2C_Read_USB_PD(Port,RW_BUFFER,&SectorData[0],8); /* Sectors Data are available in RW-BUFFER @ 0x53 */
 
-	Buffer[0] = 0 ;
+	Buffer[0] = 0 ;  /* NVM internal controller reset */
 	I2C_Write_USB_PD(Port,FTP_CTRL_0,Buffer,1);
 
 		
@@ -134,7 +155,7 @@ void CUST_ReadSector(uint8_t Port,char SectorNum, unsigned char *SectorData)
 
 void CUST_WriteSector(uint8_t Port,char SectorNum, unsigned char *SectorData)
 {
-	unsigned char Buffer[10];
+	unsigned char Buffer[2];
 
 	I2C_Write_USB_PD(Port,RW_BUFFER,SectorData,8);
 	Buffer[0]=FTP_CUST_PWR | FTP_CUST_RST_N; /*Set PWR and RST_N bits*/
@@ -165,7 +186,7 @@ void CUST_WriteSector(uint8_t Port,char SectorNum, unsigned char *SectorData)
 
 void CUST_ExitTestMode(uint8_t Port)
 {
-	unsigned char Buffer[10];
+	unsigned char Buffer[2];
 
 	Buffer[0]= FTP_CUST_RST_N; Buffer[1]=0x00;  /* clear registers */
 	I2C_Write_USB_PD(Port,FTP_CTRL_0,Buffer,2);
