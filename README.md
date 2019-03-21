@@ -3,13 +3,13 @@ Autonomous USB-C PD controller for Power Sinks / UFP (i.e. on the Devices side) 
 Certified by USB-IF consortium for USB Type-C and USB Power Delivery applications (USB-C & USB PD). <br/>
 
 ## Application summary
-By default the USB-C specification only provide 5V from a USB-PD Power Source (Host / DFP) <br/>
-This product enables to automatically negociate to the Source a higher Voltage (>5V) up to 100W. <br/>
+By default a USB Type-C port on your hardware can get only 5V from a USB-PD Power Source (Host / DFP) <br/>
+This product enables to automatically negociate with the Source a higher Voltage (>5V) up to 100W (20V@5A). <br/>
 For instance, if the Power brick can provide 4 power profiles (5V, 9V, 15V and 20V), then the STUSB4500 will request the highest voltage available (20V). <br/>
 Another example, if the Power brick can provide 4 power profiles (5V, 9V, 15V and 20V) but the Application needs 9V to boot, then the STUSB4500 can be programmed to always request 9V. <br/>
 This part can be easily implemented in a battery charger with USB-C input in the application.
 
-The device doesn't need any software to run (it is automous). But it is possible to connect to this device by I2C to take control over the default device behavior, or to get the power information (Voltage/Current) of the attached power source at the other side of the cable. This is what is showed in the demo source code of the project's repository.
+The device doesn't need any software to run (it is automous). But it is possible to connect to this device by I2C to take control over the default device behavior, or to get the power information (Voltage/Current) of the attached power source at the other side of the cable. This is what is showed in the demo source code of the project's repository (firmware_src).
 
 Info:
 ----------------
@@ -133,9 +133,11 @@ Plenty scenarios are possible, for instance:  <br/>
 |-----------|:---------------:|----------:|
 | STUSB47x0 |   <---------->  |   STUSB45 |
 | STUSB1600 |   <---------->  |   STUSB45 |
-| STUSB1602 |   <---------->  |   STUSB45 |
+| STUSB1700 |   <---------->  |   STUSB45 |
+| STUSB1602 + STM32Fx |   <---------->  |   STUSB45 |
+| STUSB1702 + SPC58 |   <---------->  |   STUSB45 |
 | STM32G0xx |   <---------->  |   STUSB45 |
 | STUSB47x0 |   <---------->  | STM32Fx + STUSB45 |
 | STUSB47x0 |   <---------->  | STM32MP1 + STUSB45 |
-
+| STM32MP1 + STUSB1602 |   <---------->  |   STUSB45 |
 
