@@ -60,6 +60,8 @@ The USB-PD chip has 148 registers (0x94).  <br/>
 Use the firmware example contained in this repository (STSW-STUSB003 Software library for STUSB4500) to control the STUSB4500 with a Micro-controller, and take control over the default behavior of the device.
 You can for instance with the MCU request any PDO that you want from the DFP (you are no more limited to 3 PDOs).
 
+Link: [Source code for this project](Firmware/readme.md)
+
 ### NVM programming
 The chip can be used in standalone with a custom configuration thanks to its internal memory.  <br/>
 The Non-Volatile Memory (NVM) contains the STUSB4500 configuration which load automatically at power-up.  <br/>
