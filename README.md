@@ -60,7 +60,8 @@ The USB-PD chip has 148 registers (0x94).  <br/>
 Use the firmware example contained in this repository (STSW-STUSB003 Software library for STUSB4500) to control the STUSB4500 with a Micro-controller, and take control over the default behavior of the device.
 You can for instance with the MCU request any PDO that you want from the DFP (you are no more limited to 3 PDOs).
 
-Link: [Source code for this project](Firmware/readme.md)
+Link: [Source code for this project](Firmware/Project/Src)  <br/>
+Link: [Firmware readme](Firmware/readme.md)  <br/>
 
 ### NVM programming
 The chip can be used in standalone with a custom configuration thanks to its internal memory.  <br/>
@@ -75,7 +76,7 @@ You can program the chip during manufacturing with any standard programming tool
 Here are the steps to program the NVM memory:
 1. Use the STSW-STUSB002 GUI to configure the STUSB4500 according to your application needs (PDO, Voltage, Current, Overvoltage protection, …)
 1. With the GUI, generate the NVM config file (.h) which contains the binary configuration of STUSB45
-1. Use the STUSB_NVM_Library source code to write the binary configuration (.h) into the chip NVM memory
+1. Use the NVM_Library source code (which contains the specific I2C sequence) to write the binary configuration (.h) into the chip NVM memory
 1. Reset the chip so that it reloads its latest NVM configuration
 
 
