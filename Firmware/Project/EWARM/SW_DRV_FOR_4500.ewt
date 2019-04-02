@@ -1210,6 +1210,9 @@
                 <name>$PROJ_DIR$\..\Src\main.c</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\..\Src\PostProcessEvents.c</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\Src\stm32f0xx_hal_msp.c</name>
             </file>
             <file>
@@ -1223,6 +1226,9 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\Src\USB_PD_core.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Src\USBPD_CUST_NVM_API.c</name>
             </file>
         </group>
     </group>

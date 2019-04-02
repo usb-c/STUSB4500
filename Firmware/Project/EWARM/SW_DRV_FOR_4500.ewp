@@ -11,7 +11,7 @@
             <name>General</name>
             <archiveVersion>3</archiveVersion>
             <data>
-                <version>30</version>
+                <version>31</version>
                 <wantNonLocal>1</wantNonLocal>
                 <debug>1</debug>
                 <option>
@@ -32,11 +32,11 @@
                 </option>
                 <option>
                     <name>Input description</name>
-                    <state>Full formatting.</state>
+                    <state>Full formatting, with multibyte support.</state>
                 </option>
                 <option>
                     <name>Output description</name>
-                    <state>Full formatting.</state>
+                    <state>Full formatting, with multibyte support.</state>
                 </option>
                 <option>
                     <name>GOutputBinary</name>
@@ -66,7 +66,7 @@
                 </option>
                 <option>
                     <name>OGLastSavedByProductVersion</name>
-                    <state>8.22.2.15993</state>
+                    <state>8.30.1.17146</state>
                 </option>
                 <option>
                     <name>GeneralEnableMisra</name>
@@ -112,7 +112,7 @@
                 </option>
                 <option>
                     <name>RTConfigPath2</name>
-                    <state>$TOOLKIT_DIR$\INC\c\DLib_Config_Full.h</state>
+                    <state>$TOOLKIT_DIR$\inc\c\DLib_Config_Full.h</state>
                 </option>
                 <option>
                     <name>GBECoreSlave</name>
@@ -204,6 +204,11 @@
                     <name>TrustZone</name>
                     <state>0</state>
                 </option>
+                <option>
+                    <name>TrustZoneModes</name>
+                    <version>0</version>
+                    <state>0</state>
+                </option>
             </data>
         </settings>
         <settings>
@@ -222,6 +227,7 @@
                     <state>USE_HAL_DRIVER</state>
                     <state>STM32F072xB</state>
                     <state>PRINTF</state>
+                    <state>DEBUG_PRINTF</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -282,7 +288,7 @@
                 <option>
                     <name>CCAllowList</name>
                     <version>1</version>
-                    <state>00000000</state>
+                    <state>10010100</state>
                 </option>
                 <option>
                     <name>CCDebugInfo</name>
@@ -366,16 +372,16 @@
                 </option>
                 <option>
                     <name>CCOptLevel</name>
-                    <state>0</state>
+                    <state>2</state>
                 </option>
                 <option>
                     <name>CCOptStrategy</name>
                     <version>0</version>
-                    <state>1</state>
+                    <state>2</state>
                 </option>
                 <option>
                     <name>CCOptLevelSlave</name>
-                    <state>0</state>
+                    <state>2</state>
                 </option>
                 <option>
                     <name>CompilerMisraRules98</name>
@@ -434,7 +440,7 @@
                 <option>
                     <name>CCOptStrategySlave</name>
                     <version>0</version>
-                    <state>1</state>
+                    <state>2</state>
                 </option>
                 <option>
                     <name>CCGuardCalls</name>
@@ -684,7 +690,7 @@
             <name>ILINK</name>
             <archiveVersion>0</archiveVersion>
             <data>
-                <version>20</version>
+                <version>21</version>
                 <wantNonLocal>1</wantNonLocal>
                 <debug>1</debug>
                 <option>
@@ -996,6 +1002,10 @@
                     <name>IlinkLocaleSelect</name>
                     <state>1</state>
                 </option>
+                <option>
+                    <name>IlinkTrustzoneImportLibraryOut</name>
+                    <state>SW_DRV_FOR_4500_import_lib.o</state>
+                </option>
             </data>
         </settings>
         <settings>
@@ -1048,6 +1058,9 @@
                 <name>$PROJ_DIR$\..\Src\main.c</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\..\Src\PostProcessEvents.c</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\Src\stm32f0xx_hal_msp.c</name>
             </file>
             <file>
@@ -1061,6 +1074,9 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\Src\USB_PD_core.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Src\USBPD_CUST_NVM_API.c</name>
             </file>
         </group>
     </group>

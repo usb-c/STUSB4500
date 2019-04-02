@@ -89,6 +89,18 @@ void SysTick_Handler(void)
   /* USER CODE END SysTick_IRQn 1 */
 }
 
+/**
+  * @brief  SYSTICK callback.
+  * @retval None
+  */
+ void HAL_SYSTICK_Callback(void)
+{
+    //#include "stm32f0xx_hal.h" //HAL_GetTick(void);
+    
+	//Tick required to support Timeout with I2C:  HAL_I2C_Mem_Read()
+	HAL_IncTick();
+}
+
 /******************************************************************************/
 /* STM32F0xx Peripheral Interrupt Handlers                                    */
 /* Add here the Interrupt Handlers for the used peripherals.                  */

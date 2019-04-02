@@ -58,6 +58,8 @@ typedef union
   } b;
 } STUSB_GEN1S_CC_DETECTION_STATUS_TRANS_RegTypeDef;
 
+#define STUSBMASK_ATTACH_STATUS_TRANS 0x01 //"0b: Cleared, 1b: Transition occurred on ATTACH_STATUS bit"
+
 /*************************************************************************************************************
   * @brief:  	STUSB_GEN1S CC_DETECTION_STATUS register Structure definition
   * @Address: 	0Eh
@@ -78,6 +80,10 @@ typedef union
     uint8_t CC_ATTACH_MODE 			:       3;
   } b;
 } STUSB_GEN1S_CC_DETECTION_STATUS_RegTypeDef;
+
+#define STUSBMASK_ATTACHED_STATUS 0x01
+#define                                 VALUE_NOT_ATTACHED 0
+#define                                 VALUE_ATTACHED 1
 
 /*************************************************************************************************************
   * @brief:  	STUSB_GEN1S MONITORING_STATUS_TRANS register Structure definition
@@ -223,6 +229,8 @@ typedef union
         uint8_t REVERSE		:	1;    
   } b;
 } STUSB_GEN1S_TYPE_C_STATUS_RegTypeDef;
+
+#define MASK_REVERSE 0x80 //0: CC1 is attached 1: CC2 is Attach.
 
 #define PRT_STATUS 0x16
 /************************************************************************************************************
@@ -371,6 +379,20 @@ typedef union
 
 
 
+#define STUSB_GEN1S_MONITORING_CTRL_0 0x20
+#define STUSB_GEN1S_MONITORING_CTRL_1 0x21
+#define STUSB_GEN1S_MONITORING_CTRL_2 0x22
+
+typedef union
+{
+  uint8_t d8;
+  struct
+  {
+        uint8_t VSEL_PDO	:	8;
+  } b;
+} STUSB_GEN1S_MONITORING_CTRL_1_RegTypeDef;
+
+
 #define STUSB_GEN1S_RESET_CTRL_REG			0x23
 /************************************************************************************************************
   * @brief:  	STUSB RESET_CTRL register Structure definition
@@ -403,8 +425,28 @@ typedef enum
  
 
 
-#define RX_HEADER 0x31
-#define RX_DATA_OBJ 0x33
+#define RX_BYTE_CNT           0x30
+#define RX_HEADER             0x31 //RX message header (16bit)
+#define RX_DATA_OBJ           0x33
+#define RX_DATA_OBJ1          0x33  //(32bit)
+#define RX_DATA_OBJ2          0x37  //(32bit)
+#define RX_DATA_OBJ3          0x3B  //(32bit)
+#define RX_DATA_OBJ4          0x3F  //(32bit)
+#define RX_DATA_OBJ5          0x33  //(32bit)
+#define RX_DATA_OBJ6          0x37  //(32bit)
+#define RX_DATA_OBJ7          0x4B  //(32bit)
+
+#define TX_BYTE_CNT            0x50
+#define TX_HEADER_LOW          0x51
+#define TX_DATA_OBJ1          0x53
+#define TX_DATA_OBJ2          0x57
+#define TX_DATA_OBJ3          0x5B
+#define TX_DATA_OBJ4          0x5F
+#define TX_DATA_OBJ5          0x63
+#define TX_DATA_OBJ6          0x67
+#define TX_DATA_OBJ7          0x6B
+
+
 
 #define DPM_PDO_NUMB 0x70 
 

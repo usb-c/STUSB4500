@@ -142,11 +142,23 @@ void HAL_I2C_MspDeInit(I2C_HandleTypeDef* i2cHandle)
 
 HAL_StatusTypeDef I2C_Read_USB_PD(uint8_t Port,uint16_t I2cDeviceID_7bit ,uint16_t Address ,void *DataR ,uint16_t Length)
 {
-
+    HAL_StatusTypeDef status;
   
-  return  HAL_I2C_Mem_Read(hi2c[Port],(I2cDeviceID_7bit<<1), Address ,AddressSize, DataR, Length ,2000);
+restart:
+    
+  status = HAL_I2C_Mem_Read(hi2c[Port],(I2cDeviceID_7bit<<1), Address ,AddressSize, DataR, Length ,2000);
   
+  if(status == HAL_BUSY) //should not happen, except during IRQ routine
+  {
+      HAL_I2C_DeInit(hi2c[Port]);
+      HAL_I2C_Init(hi2c[Port]);
+      
+      goto restart;
+  }
+  
+  return status;
 }
+
 HAL_StatusTypeDef I2C_Write_USB_PD(uint8_t Port,uint16_t I2cDeviceID_7bit ,uint16_t Address ,uint8_t *DataW ,uint16_t Length)
 {
   return  HAL_I2C_Mem_Write(hi2c[Port],(I2cDeviceID_7bit<<1), Address ,AddressSize, DataW, Length,2000 ); // unmask all alarm status

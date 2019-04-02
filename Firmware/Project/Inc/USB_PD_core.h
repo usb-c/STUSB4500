@@ -55,7 +55,8 @@ extern "C" {
   
 #define USBPORT_MAX 1
 #define I2CBUS_MAX 1
-  
+#define SRC_PDO_NUM_MAX 7
+
 #define true 1
 #define false 0    
   
@@ -163,7 +164,7 @@ typedef union
       {       
         uint32_t Max_Operating_Current :10;
         uint32_t Voltage :10;
-        uint8_t PeakCurrent:3;
+        uint8_t PeakCurrent:2;
         uint8_t Reserved :3;
         uint8_t DataRoleSwap:1;
         uint8_t Communication:1;
@@ -211,12 +212,13 @@ void Read_RDO(uint8_t Usb_Port);
 void Print_RDO(uint8_t Usb_Port);
 void Update_PDO(uint8_t Usb_Port,uint8_t PDO_Number,int Voltage,int Current);
 void Update_Valid_PDO_Number(uint8_t Usb_Port,uint8_t Number_PDO);
+int Find_Matching_SRC_PDO(uint8_t Usb_Port,int Min_Power,int Min_V , int Max_V);
 
 void Set_New_PDO_case1(uint8_t Usb_Port);
 void Negotiate_5V(uint8_t Usb_Port);
-void Print_PDO_FROM_SRC(uint8_t Usb_Port);
-
-
+//void Print_PDO_FROM_SRC(uint8_t Usb_Port);
+int CheckCableAttachementStatus(void);
+void Clear_PDO_FROM_SRC(uint8_t Usb_Port);
 
 #ifdef __cplusplus
 }

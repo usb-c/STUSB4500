@@ -7,10 +7,10 @@ extern unsigned int I2cDeviceID_7bit;
 extern unsigned int Address;
 extern unsigned int AddressSize ;
 
-#define STUSB4500_I2C_DEVID_7BIT  0x28
-#define STUSB4500_I2C_DEVID_8BIT  0x50
-#define I2C_Write_USB_PD(a,b,c,d) I2C_Write_USB_PD(a,STUSB4500_I2C_DEVID_7BIT, b,c,d)
-#define I2C_Read_USB_PD(a,b,c,d) I2C_Read_USB_PD(a,STUSB4500_I2C_DEVID_7BIT, b,c,d)
+#define STUSB4500_I2C_SLAVE_ADDR_7BIT  0x28
+#define STUSB4500_I2C_SLAVE_ADDR_8BIT  0x50
+#define I2C_Write_USB_PD(a,b,c,d) I2C_Write_USB_PD(a,STUSB4500_I2C_SLAVE_ADDR_7BIT, b,c,d)
+#define I2C_Read_USB_PD(a,b,c,d) I2C_Read_USB_PD(a,STUSB4500_I2C_SLAVE_ADDR_7BIT, b,c,d)
 
 void nvm_flash(uint8_t Port);
 void CUST_EnterWriteMode(uint8_t Port,unsigned char ErasedSector);
