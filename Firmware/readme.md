@@ -21,3 +21,14 @@ The library includes: the STUSB4500 hardware abstraction layers, drivers, Code e
   * Any microcontroller with I2C interface
   * STEVAL-ISC005V1: STUSB4500 evaluation board
   * The demo is using NUCLEO-F072RB: STM32 Nucleo-64 development board with ARM Cortex-M0
+
+## Demo
+Here are some screenshots showing the demo result when connecting the USB-C cable.
+
+* Example using a power source with 2 PDOs (Google Pixel Power supply 18W)
+
+![Screenshot-Terminal_demo](https://raw.githubusercontent.com/usb-c/STUSB4500/master/Pics/FW/STUSB4500_FW_screenshot_example_01.png)
+
+* Example using a power source with 3 PDOs (Apple Macbook Power brick 60W)
+
+![Screenshot-Terminal_demo](https://raw.githubusercontent.com/usb-c/STUSB4500/master/Pics/FW/STUSB4500_FW_screenshot_example_02.png)
