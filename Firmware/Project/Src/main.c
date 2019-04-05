@@ -50,6 +50,8 @@
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
+//#define USE_RESET_PIN
+//#define DEMO_PDO_ROLLING
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
@@ -137,7 +139,7 @@ int main(void)
     AddressSize = I2C_MEMADD_SIZE_8BIT; 
     
     
-    Status = I2C_Read_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit,DEVICE_ID ,&Cut[Usb_Port], 1 );
+    Status = I2C_Read_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit, REG_DEVICE_ID ,&Cut[Usb_Port], 1 );
     if(Status != 0)
     {
         printf("I2C Error\r\n");
@@ -171,24 +173,25 @@ int main(void)
         
         if( (DataR & STUSBMASK_ATTACHED_STATUS) == VALUE_ATTACHED)
         {
+            CableAttached = 1;
+            
             uint8_t Data;
-            Address = TYPE_C_STATUS; //[Read]
+            Address = TYPE_C_STATUS; //[Read only]
             Status = I2C_Read_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus, STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit, Address , &Data, 1 );
+            if(Status != 0) return -1; //I2C Error
+            
             if(( Data & MASK_REVERSE) == 0)
             {
-                //printf("[CC1]");
                 printf("Attached [CC1] ");
             }
             else
             {
-                //printf("[CC2]");
                 printf("Attached [CC2] ");
             }
-            
-            CableAttached = 1;
         }
         else
         {
+            CableAttached = 0;
             printf("Not-attached ");
         }
         
@@ -200,17 +203,29 @@ int main(void)
         Print_RDO(Usb_Port);
     }
     
+#ifdef USE_RESET_PIN
+    printf("Resetting the STUSB4500 (Hard-RESET) \r\n");
     HW_Reset_state(Usb_Port);
     
-    //printf("STUSB4500 SW-RESET ");
-    //SW_reset_by_Reg(Usb_Port);
-    //Status = I2C_Read_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit,DEVICE_ID ,&Cut[Usb_Port], 1 );
-    
+#else
+    printf("STUSB4500 SW-RESET ");
+    SW_reset_by_Reg(Usb_Port);
+    Status = I2C_Read_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit,REG_DEVICE_ID ,&Cut[Usb_Port], 1 );
+#endif
     
     Print_PDO_FROM_SRC(Usb_Port);
-    Update_PDO(Usb_Port,2,15000,1500);
-    Update_PDO(Usb_Port,3,20000,1500);    
+    
+    printf("Changing the PDOs ... \r\n");
+    Update_Valid_PDO_Number( Usb_Port, 3 );
+    Update_PDO(Usb_Port,1,5000,1500);
+    Update_PDO(Usb_Port,2,15000,1000);
+    Update_PDO(Usb_Port,3,20000,1000);   
+    Status = SW_reset_by_Reg(Usb_Port);
+    usb_pd_init(Usb_Port); //refresh main registers & IRQ mask init needed after reset
+    
+    
     Read_SNK_PDO(Usb_Port);
+    
     Time_elapse = PDO_SNK_NUMB[Usb_Port];
     Print_SNK_PDO(Usb_Port);
     //Prev_Connection_status = 0;
@@ -225,41 +240,17 @@ int main(void)
         
         /* USER CODE BEGIN 3 */
         
+        PostProcess_UsbEvents();
         
         if( push_button_Action_Flag[Usb_Port] == 1  )
             push_button_Action(); 
         
+        
+#ifdef DEMO_PDO_ROLLING  // Define to enable the STUSB4500_PDO_rolling_DEMO
         // UNCOMMENT the bellow 2 lines in order to enable the STUSB4500_PDO_rolling_DEMO
         //    if( Timer_Action_Flag[Usb_Port] == 1  )
         //      Timer_Action();          
-        
-        //        if(USB_PD_Interupt_Flag[Usb_Port] == 0)
-        //          {
-        //            
-        //            if ( flag_once == 1)
-        //              {
-        //                if(PD_status[Usb_Port].Port_Status.b.CC_ATTACH_STATE  !=0)
-        //                  {
-        //                    I2C_Read_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit ,0x29 ,&Buffer[0], 1 );
-        //                    if (( Buffer[0] == 0x18) )
-        //                      {
-        //                        flag_once = 0;
-        //                        Prev_Connection_status = 0;
-        //                        Print_SNK_PDO(Usb_Port);
-        //                        Print_PDO_FROM_SRC(Usb_Port);
-        //                        Read_RDO(Usb_Port);
-        //                        Print_RDO(Usb_Port);
-        //                      }
-        //                    
-        //                  }
-        //                
-        //              }
-        //          }
-        
-        //        if ( HAL_GPIO_ReadPin(ALERT_A_GPIO_Port,ALERT_A_Pin)== GPIO_PIN_RESET) //if(USB_PD_Interupt_Flag[Usb_Port] == 1)
-        //          ALARM_MANAGEMENT(Usb_Port); 
-        
-        PostProcess_Events();
+#endif
         
     }
     /* USER CODE END 3 */
@@ -356,7 +347,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 }
 
 
-void push_button_Action(void)
+void push_button_DebugIrq(void)
 {
     uint8_t Usb_Port = 0;
 #ifdef PRINTF
@@ -459,10 +450,24 @@ void push_button_Action(void)
     printf("SW-RESET ");
     SW_reset_by_Reg(Usb_Port);
     
-    usb_pd_init(0);
+    usb_pd_init(0); //refresh main registers & IRQ mask init needed after reset
 #endif
+    
+    //--------------------------------------
+    Print_PDO_Voltage();
     //--------------------------------------
     
+    push_button_Action_Flag[Usb_Port] = 0 ;
+}
+
+
+
+void push_button_Action(void)
+{
+    uint8_t Usb_Port = 0;
+#ifdef PRINTF
+    printf("Push button \r\n");
+#endif
 #if 1
     printf("[%d]", PB_press%5);
     
@@ -519,6 +524,7 @@ void push_button_Action(void)
     
     push_button_Action_Flag[Usb_Port] = 0 ;
 }
+
 
 void Timer_Action(void)
 {
@@ -607,14 +613,17 @@ void Timer_Action(void)
             Time_elapse = 1;
             break;            
         }
+        
         flag_once = 1;
         SW_reset_by_Reg(Usb_Port);
         Status = I2C_Read_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit ,PORT_STATUS ,&PD_status[Usb_Port].Port_Status.d8, 1 );
+        
         if ( Time_elapse == 1)
             Flag_count = 1 ;
         if ( Time_elapse == 5)
             Flag_count = 0 ;
     }
+    
     Timer_Action_Flag[Usb_Port] = 0 ;
 }
 

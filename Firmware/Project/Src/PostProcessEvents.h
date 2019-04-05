@@ -1,4 +1,4 @@
-int PostProcess_Events();
+int PostProcess_UsbEvents();
 int Push_PD_MessageReceived(char MessageType, char MessageValue);
 int Pop_PD_MessageReceived(void);
 int Push_IrqReceived(char MessageType);

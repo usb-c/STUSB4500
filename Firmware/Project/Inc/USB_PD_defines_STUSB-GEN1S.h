@@ -494,7 +494,7 @@ typedef union
   uint32_t d32;
   struct
   {     
-        uint32_t MaxCurrent                     :       10;
+        uint32_t MaxCurrent                     :       10; //Bits 9..0
         uint32_t OperatingCurrent               :       10;
         uint8_t reserved_22_20                  :       3;
         uint8_t UnchunkedMess_sup               :       1;
@@ -502,15 +502,15 @@ typedef union
         uint8_t UsbComCap                       :       1;
         uint8_t CapaMismatch                    :       1;
         uint8_t GiveBack                        :       1;
-        uint8_t Object_Pos                      :       3;
-        uint8_t reserved_31		        :	1;
+        uint8_t Object_Pos                      :       3; //Bits 30..28 (3-bit)
+        uint8_t reserved_31		        :	1; //Bits 31
         
   } b;
 } STUSB_GEN1S_RDO_REG_STATUS_RegTypeDef;
 
 
 /*Identification of STUSB */
-#define DEVICE_ID 0x2F
+#define REG_DEVICE_ID 0x2F
 #define EXTENTION_10  (uint8_t )0x80
 #define ID_Reg (uint8_t )0x1C 
 #define CUT (uint8_t )3<<2

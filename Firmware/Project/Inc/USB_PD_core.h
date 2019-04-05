@@ -202,7 +202,7 @@ typedef struct
 
 
 void HW_Reset_state(uint8_t Usb_Port);
-void SW_reset_by_Reg(uint8_t Usb_Port);
+int SW_reset_by_Reg(uint8_t Usb_Port);
 void usb_pd_init(uint8_t Usb_Port);
 void ALARM_MANAGEMENT(uint8_t Usb_Port);
 void Read_SNK_PDO(uint8_t Usb_Port);
@@ -210,8 +210,8 @@ void Print_SNK_PDO(uint8_t Usb_Port);
 void Print_PDO_FROM_SRC(uint8_t Usb_Port);
 void Read_RDO(uint8_t Usb_Port);
 void Print_RDO(uint8_t Usb_Port);
-void Update_PDO(uint8_t Usb_Port,uint8_t PDO_Number,int Voltage,int Current);
-void Update_Valid_PDO_Number(uint8_t Usb_Port,uint8_t Number_PDO);
+int Update_PDO(uint8_t Usb_Port,uint8_t PDO_Number,int Voltage,int Current);
+int Update_Valid_PDO_Number(uint8_t Usb_Port,uint8_t Number_PDO);
 int Find_Matching_SRC_PDO(uint8_t Usb_Port,int Min_Power,int Min_V , int Max_V);
 
 void Set_New_PDO_case1(uint8_t Usb_Port);
@@ -219,6 +219,7 @@ void Negotiate_5V(uint8_t Usb_Port);
 //void Print_PDO_FROM_SRC(uint8_t Usb_Port);
 int CheckCableAttachementStatus(void);
 void Clear_PDO_FROM_SRC(uint8_t Usb_Port);
+void Print_PDO_Voltage(void);
 
 #ifdef __cplusplus
 }

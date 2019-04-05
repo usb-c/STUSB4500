@@ -119,7 +119,7 @@ int Pop_IrqReceived(void)
 
 
 
-int PostProcess_Events()
+int PostProcess_UsbEvents()
 {
     int Usb_Port = 0;
     int Status;

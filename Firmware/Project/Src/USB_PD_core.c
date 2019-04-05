@@ -45,13 +45,15 @@ After reset, STUSB4500 behave according to Non Volatile Memory defaults settings
 void HW_Reset_state(uint8_t Usb_Port)
 {
     uint8_t Buffer[2];
+    
     HAL_GPIO_WritePin(Reset_GPIO_Port,Reset_Pin,GPIO_PIN_SET);
     HAL_Delay(15);  /*time to be dedected by the source */
     HAL_GPIO_WritePin(Reset_GPIO_Port,Reset_Pin,GPIO_PIN_RESET);
-    usb_pd_init(0);
+    
+    usb_pd_init(Usb_Port); //refresh main registers & IRQ mask init needed after reset
+    
     Buffer[0] = 3;
     I2C_Write_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit ,DPM_PDO_NUMB,&Buffer[0],1 ); 
-    
 }
 
 /************************   SW_reset_by_Reg (uint8_t Port)  *************************
@@ -60,20 +62,35 @@ ALERT. By initialisating Type-C pull-down termination, it forces electrical USB 
 disconnection (both on SOURCE and SINK sides). 
 ************************************************************************************/
 
-void SW_reset_by_Reg(uint8_t Usb_Port)
+int SW_reset_by_Reg(uint8_t Usb_Port)
 {
     int Status,i;
     uint8_t Buffer[12];
     Buffer[0] = SW_RST;
     Status = I2C_Write_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit ,STUSB_GEN1S_RESET_CTRL_REG,&Buffer[0],1 );
+    if(Status != 0) return -1; //I2C Error
+    
+    
+    //Wait the device is ready to reply after reset
+    for(i=0; i<2; i++)
+    {
+        uint8_t DevId;
+        Status = I2C_Read_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit, REG_DEVICE_ID ,&DevId, 1 );
+    }
+    
     
     for (i=0;i<=12;i++)
+    {
         Status = I2C_Read_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit ,ALERT_STATUS_1+i ,&Buffer[0], 1 );  // clear ALERT Status
+        if(Status != 0) return -1; //I2C Error
+    }
+    
     HAL_Delay(27); // on source , the debounce time is more than 15ms error recovery > at 25ms 
     
     Buffer[0] = No_SW_RST; 
     Status = I2C_Write_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit ,STUSB_GEN1S_RESET_CTRL_REG,&Buffer[0],1 ); 
     
+    return 0;
 }
 
 /***************************   usb_pd_init(uint8_t Port)  ***************************
@@ -90,7 +107,7 @@ void usb_pd_init(uint8_t Usb_Port)
     DataRW[0]= 0;
     
     uint8_t Cut;
-    I2C_Read_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit ,0x2F ,&Cut, 1 );
+    I2C_Read_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit , REG_DEVICE_ID ,&Cut, 1 );
     
     Address = DPM_SNK_PDO1;
     I2C_Read_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit ,Address ,&DataRW[0],12  );
@@ -104,12 +121,13 @@ void usb_pd_init(uint8_t Usb_Port)
     // clear all ALERT Status
     Address = ALERT_STATUS_1;
     for (i=0;i<=12;i++) /* clear ALERT Status */
+    {
         Status = I2C_Read_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit ,Address+i ,&DataRW[0], 1 );  // clear ALERT Status
+    }
     
     
+    //Set Interrupt to unmask
     Alert_Mask.d8 = 0xFF;
-    
-    
     Alert_Mask.b.HARD_RESET_AL_MASK = 0; //Added Mask
     Alert_Mask.b.CC_DETECTION_STATUS_AL_MASK = 0;
     Alert_Mask.b.PD_TYPEC_STATUS_AL_MASK = 0;
@@ -386,9 +404,6 @@ This function print the STUSB4500 PDO to the serial interface.
 void Print_SNK_PDO(uint8_t Usb_Port)  
 {
     static uint8_t i;
-    static float PDO_V;
-    static float PDO_I;
-    static int   PDO_P;
     static int MAX_POWER = 0;
     MAX_POWER = 0;
     
@@ -438,9 +453,9 @@ void Print_SNK_PDO(uint8_t Usb_Port)
                 static float PDO_V_Min;
                 static float PDO_V_Max;
                 static int   PDO_P;          
-                PDO_V_Max = (float) (PDO_SNK[Usb_Port][i].bat.Max_Voltage)/20;
-                PDO_V_Min = (float) (PDO_SNK[Usb_Port][i].bat.Min_Voltage)/20;
-                PDO_P = (float) (PDO_SNK[Usb_Port][i].bat.Operating_Power)/4; 
+                PDO_V_Max = (float) (PDO_SNK[Usb_Port][i].bat.Max_Voltage)/20.0f;
+                PDO_V_Min = (float) (PDO_SNK[Usb_Port][i].bat.Min_Voltage)/20.0f;
+                PDO_P = (float) (PDO_SNK[Usb_Port][i].bat.Operating_Power)/4.0f; 
 #ifdef PRINTF   
                 printf(" -Battery PDO%u=(%4.2fV, %4.2fV, = %uW)\r\n",i+1, PDO_V_Min, PDO_V_Max, PDO_P );
 #endif 
@@ -477,7 +492,7 @@ capability MATCH between the STUSB4500 and the SOURCE.
 
 void Print_RDO(uint8_t Usb_Port)
 {
-    static uint8_t Buffer;
+    uint8_t Buffer = 0;
     
     printf("\r\n");
     printf("                         ");
@@ -488,7 +503,7 @@ void Print_RDO(uint8_t Usb_Port)
     if (Nego_RDO.d32 != 0)
     {
         printf("                         ");
-        printf("Requested PDO Position: %d\r\n", Nego_RDO.b.Object_Pos);
+        printf("Requested position: PDO %d\r\n", Nego_RDO.b.Object_Pos);
         
 #ifndef USE_FLOAT
         int OpCurrent_mA = Nego_RDO.b.OperatingCurrent * 10;
@@ -524,27 +539,57 @@ void Print_RDO(uint8_t Usb_Port)
 #endif
 }
 
+void Print_PDO_Voltage(void)
+{
+    int Usb_Port=0;
+    uint8_t Buffer = 0;
+
+    I2C_Read_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit , STUSB_GEN1S_MONITORING_CTRL_1 ,&Buffer, 1 );
+    
+#ifndef USE_FLOAT
+    int Voltage_mV = Buffer*100;
+    printf("                         ");
+    printf("Voltage requested: %i mV\r\n" , Voltage_mV);
+#else
+    float Voltage_V = (float)Buffer / 10.0f;
+    printf("                         ");
+    printf("Voltage requested: %4.2f V\r\n" , Voltage_V);
+#endif
+}
 
 /******************   Update_PDO(Port, PDO_number, Voltage, Current)   *************
-This function must be used to overwrite PDO2 or PDO3 content in RAM.
+This function must be used to overwrite PDO1, PDO2 or PDO3 content in RAM.
 Arguments are:
 - Port Number:
-- PDO Number : 2 or 3 , 
+- PDO Number : 1, 2 or 3 , 
 - Voltage in(mV) truncated by 50mV ,
 - Current in(mv) truncated by 10mA
 ************************************************************************************/
 
-void Update_PDO(uint8_t Usb_Port,uint8_t PDO_Number,int Voltage,int Current)
+int Update_PDO(uint8_t UsbPort, uint8_t PDO_Number, int Voltage_mV, int Current_mA)
 {
-    uint8_t adresse;
-    int Status;
-    PDO_SNK[Usb_Port][PDO_Number - 1].fix.Voltage = Voltage /50 ;
-    PDO_SNK[Usb_Port][PDO_Number- 1 ].fix.Operationnal_Current = Current / 10;
-    if ( (PDO_Number == 2) ||(PDO_Number == 3))
+    uint8_t address;
+    int Status = -1;
+    
+    if ( (PDO_Number == 1) || (PDO_Number == 2) || (PDO_Number == 3))
     {
-        adresse = DPM_SNK_PDO1 + 4*(PDO_Number - 1) ;
-        Status = I2C_Write_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit ,adresse ,(uint8_t *)&PDO_SNK[Usb_Port][PDO_Number - 1].d32, 4 );
+        PDO_SNK[UsbPort][PDO_Number - 1 ].fix.Operationnal_Current = Current_mA / 10;
+        
+        if ( PDO_Number == 1)
+        {
+            //force 5V for PDO_1 to follow the USB PD spec
+            PDO_SNK[UsbPort][PDO_Number - 1].fix.Voltage = 100; // 5000/50=100
+        }
+        else
+        {
+            PDO_SNK[UsbPort][PDO_Number - 1].fix.Voltage = Voltage_mV /50 ;
+        }
+        
+        address = DPM_SNK_PDO1 + 4*(PDO_Number - 1) ;
+        Status = I2C_Write_USB_PD(STUSB45DeviceConf[UsbPort].I2cBus,STUSB45DeviceConf[UsbPort].I2cDeviceID_7bit ,address ,(uint8_t *)&PDO_SNK[UsbPort][PDO_Number - 1].d32, 4 );
     }
+    
+    return Status;
 }
 
 /************* Update_Valid_PDO_Number(Port, PDO_Number)  ***************************
@@ -554,16 +599,18 @@ Arguments are:
 - active PDO Number: from 1 to 3 
 ************************************************************************************/
 
-void Update_Valid_PDO_Number(uint8_t Usb_Port,uint8_t Number_PDO)
+int Update_Valid_PDO_Number(uint8_t Usb_Port,uint8_t Number_PDO)
 {
+    int Status = -1;
     
     if (Number_PDO >= 1 && Number_PDO <=3)
     {
         PDO_SNK_NUMB[Usb_Port] = Number_PDO;
-        I2C_Write_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit ,DPM_PDO_NUMB,&Number_PDO,1 ); 
+        Status = I2C_Write_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit ,DPM_PDO_NUMB,&Number_PDO,1 ); 
     }
+    
+    return Status;
 }
-
 
 
 
