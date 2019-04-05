@@ -46,6 +46,7 @@
 /* USER CODE BEGIN Includes */
 
 #include "USB_PD_core.h"
+#include "USB_PD_demo.h"
 #include "PostProcessEvents.h"
 /* USER CODE END Includes */
 
@@ -218,7 +219,7 @@ int main(void)
     printf("Changing the PDOs ... \r\n");
     Update_Valid_PDO_Number( Usb_Port, 3 );
     Update_PDO(Usb_Port,1,5000,1500);
-    Update_PDO(Usb_Port,2,15000,1000);
+    Update_PDO(Usb_Port,2,9000,1000);
     Update_PDO(Usb_Port,3,20000,1000);   
     Status = SW_reset_by_Reg(Usb_Port);
     usb_pd_init(Usb_Port); //refresh main registers & IRQ mask init needed after reset
@@ -243,7 +244,13 @@ int main(void)
         PostProcess_UsbEvents();
         
         if( push_button_Action_Flag[Usb_Port] == 1  )
+        {
+#if 1
             push_button_Action(); 
+#else
+            push_button_Action2();
+#endif
+        }
         
         
 #ifdef DEMO_PDO_ROLLING  // Define to enable the STUSB4500_PDO_rolling_DEMO
@@ -525,6 +532,22 @@ void push_button_Action(void)
     push_button_Action_Flag[Usb_Port] = 0 ;
 }
 
+void push_button_Action2(void)
+{
+    uint8_t Usb_Port = 0;
+    
+#ifdef PRINTF
+    printf("\r\n------------------------------------------------");
+    printf("\r\n>>> Push-Button: ");
+#endif
+    
+    printf("Selecting Next PDO...");
+    Select_Next_PDO_SRC(Usb_Port, NULL);
+    Print_SNK_PDO(Usb_Port);
+    
+    
+    push_button_Action_Flag[Usb_Port] = 0 ;
+}
 
 void Timer_Action(void)
 {

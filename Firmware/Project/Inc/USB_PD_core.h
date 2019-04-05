@@ -209,10 +209,13 @@ void Read_SNK_PDO(uint8_t Usb_Port);
 void Print_SNK_PDO(uint8_t Usb_Port);
 void Print_PDO_FROM_SRC(uint8_t Usb_Port);
 void Read_RDO(uint8_t Usb_Port);
+int Get_RDO(uint8_t UsbPort, int * out_PDO_nb , int * out_Voltage_mV, int * out_Current_mA, int * out_MaxCurrent_mA);
 void Print_RDO(uint8_t Usb_Port);
 int Update_PDO(uint8_t Usb_Port,uint8_t PDO_Number,int Voltage,int Current);
 int Update_Valid_PDO_Number(uint8_t Usb_Port,uint8_t Number_PDO);
+int Get_current_Sink_PDO_Numb(uint8_t UsbPort, uint8_t * out_PDO_Count);
 int Find_Matching_SRC_PDO(uint8_t Usb_Port,int Min_Power,int Min_V , int Max_V);
+
 
 void Set_New_PDO_case1(uint8_t Usb_Port);
 void Negotiate_5V(uint8_t Usb_Port);

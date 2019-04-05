@@ -483,6 +483,49 @@ void Read_RDO(uint8_t Usb_Port)
 }
 
 
+int Get_RDO(uint8_t UsbPort, int * out_PDO_nb , int * out_Voltage_mV, int * out_Current_mA, int * out_MaxCurrent_mA)
+{
+    int status;
+    uint8_t Buffer;
+    
+    status = I2C_Read_USB_PD(STUSB45DeviceConf[UsbPort].I2cBus,STUSB45DeviceConf[UsbPort].I2cDeviceID_7bit ,RDO_REG_STATUS ,(uint8_t *)&Nego_RDO.d32, 4 );
+    if(status != 0) { return -1; }
+    
+    int PDO_number = Nego_RDO.b.Object_Pos;
+    int OpCurrent_mA = Nego_RDO.b.OperatingCurrent * 10;
+    int MaxCurrent_mA = Nego_RDO.b.MaxCurrent * 10;
+    
+    
+    if( (out_PDO_nb == NULL) || (out_Voltage_mV == NULL) || (out_Current_mA == NULL) || (out_MaxCurrent_mA == NULL) )
+        return -2;
+    else
+    {
+        *out_PDO_nb = PDO_number;
+        // *out_Voltage_mV = Voltage_mV;
+        *out_Current_mA = OpCurrent_mA;
+        *out_MaxCurrent_mA = MaxCurrent_mA;
+    }
+
+#if 0 //to test
+    status = I2C_Read_USB_PD(STUSB45DeviceConf[UsbPort].I2cBus,STUSB45DeviceConf[UsbPort].I2cDeviceID_7bit , STUSB_GEN1S_MONITORING_CTRL_1 ,&Buffer, 1 );
+    if(status != 0) { return -1; }
+    int Voltage_mV = Buffer * 100;
+    *out_Voltage_mV = Voltage_mV;
+#endif
+    
+    
+    *out_Voltage_mV = 0;
+    if(PDO_number >=1)
+    {
+    int idx = PDO_number - 1;
+    int PDO_mV = (PDO_FROM_SRC[UsbPort][idx].fix.Voltage)*50; // *1000/20 = 50;
+    *out_Voltage_mV = PDO_mV;
+    }
+    
+    
+    return status;
+}
+
 /**********************     Print_RDO(uint8_t Port)   ***************************
 This function prints to the serial interface the current contract in case of 
 capability MATCH between the STUSB4500 and the SOURCE.
@@ -613,6 +656,29 @@ int Update_Valid_PDO_Number(uint8_t Usb_Port,uint8_t Number_PDO)
 }
 
 
+int Get_current_Sink_PDO_Numb(uint8_t UsbPort, uint8_t * out_PDO_Count)
+{
+    int Status = -1;
+    int PDO_Count;
+    
+    if(out_PDO_Count == NULL)
+        return -2;
+    
+        //PDO_Count = PDO_SNK_NUMB[UsbPort];
+        Status = I2C_Read_USB_PD(STUSB45DeviceConf[UsbPort].I2cBus, STUSB45DeviceConf[UsbPort].I2cDeviceID_7bit, DPM_PDO_NUMB, &PDO_Count, 1 ); 
+        
+        if(Status == 0) 
+        { 
+            *out_PDO_Count = PDO_Count;
+        }
+        else
+        {
+            *out_PDO_Count = 0; //error
+        }
+    
+    return Status;
+}
+
 
 /**********************     Set_New_PDO_case1(uint8_t Port)   ************************
 Sample function that sets PDO2 and PDO3 to 15V/1.5A and 20V/1.5A respectively.
@@ -691,6 +757,7 @@ int Find_Matching_SRC_PDO(uint8_t Usb_Port,int Min_Power,int Min_V , int Max_V)
     return 1;
     
 }
+
 
 /**********************     Print_PDO_FROM_SRC(uint8_t Usb_Port)    *************************** 
 This function prints the SOURCE capabilities received by the STUSB4500. 

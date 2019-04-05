@@ -1228,6 +1228,9 @@
                 <name>$PROJ_DIR$\..\Src\USB_PD_core.c</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\..\Src\USB_PD_demo.c</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\Src\USBPD_CUST_NVM_API.c</name>
             </file>
         </group>
