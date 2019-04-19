@@ -62,6 +62,10 @@ int Select_Next_PDO_SRC(uint8_t UsbPort, int * out_NewPDO_mV)
         }
         
     }
+    else //(PDO_FROM_SRC_Num[UsbPort] == 0 )
+    {
+        status = -2; //Error
+    }
     
     return status;
 }

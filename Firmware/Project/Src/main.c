@@ -51,7 +51,12 @@
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
-//#define USE_RESET_PIN
+#define VBUS_POWERED_APPLICATION
+//#define BATTERY_POWERED_APPLICATION
+
+#define USE_RESET_PIN
+//#define USE_RESET_SWRESET
+
 //#define DEMO_PDO_ROLLING
 
 /* USER CODE BEGIN PV */
@@ -204,6 +209,12 @@ int main(void)
         Print_RDO(Usb_Port);
     }
     
+#if defined(VBUS_POWERED_APPLICATION)
+    printf("PD Source SW-RESET ");
+    PdMessage_SoftReset(); //To make the Source send its PDO Capabilities
+    
+#else //BATTERY_POWERED_APPLICATION
+    
 #ifdef USE_RESET_PIN
     printf("Resetting the STUSB4500 (Hard-RESET) \r\n");
     HW_Reset_state(Usb_Port);
@@ -212,6 +223,8 @@ int main(void)
     printf("STUSB4500 SW-RESET ");
     SW_reset_by_Reg(Usb_Port);
     Status = I2C_Read_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit,REG_DEVICE_ID ,&Cut[Usb_Port], 1 );
+#endif
+    
 #endif
     
     Print_PDO_FROM_SRC(Usb_Port);
@@ -245,7 +258,7 @@ int main(void)
         
         if( push_button_Action_Flag[Usb_Port] == 1  )
         {
-#if 1
+#if 0
             push_button_Action(); 
 #else
             push_button_Action2();
@@ -535,14 +548,20 @@ void push_button_Action(void)
 void push_button_Action2(void)
 {
     uint8_t Usb_Port = 0;
+    int status;
     
 #ifdef PRINTF
     printf("\r\n------------------------------------------------");
     printf("\r\n>>> Push-Button: ");
 #endif
     
-    printf("Selecting Next PDO...");
-    Select_Next_PDO_SRC(Usb_Port, NULL);
+    printf("Selecting Next PDO... ");
+    status = Select_Next_PDO_SRC(Usb_Port, NULL);
+    if (status != 0)
+    {
+        printf("ERROR %d\r\n", status);
+    }
+
     Print_SNK_PDO(Usb_Port);
     
     

@@ -3,11 +3,15 @@
 #include "USBPD_spec_defines.h"
 #include "PostProcessEvents.h"
 
+volatile int PostProcess_IrqReceived = 0;
 volatile int PostProcess_AttachTransition = 0;
 volatile int PostProcess_PD_MessageReceived = 0;
 volatile int PostProcess_SRC_PDO_Received = 0;
 volatile int PostProcess_PSRDY_Received = 0;
-volatile int PostProcess_IrqReceived = 0;
+volatile int PostProcess_Msg_Accept = 0;
+volatile int PostProcess_Msg_Reject = 0;
+
+
 
 extern USB_PD_StatusTypeDef PD_status[USBPORT_MAX] ;
 extern USB_PD_I2C_PORT STUSB45DeviceConf[USBPORT_MAX];
@@ -203,6 +207,7 @@ int PostProcess_UsbEvents()
                     break;
                     
                 case USBPD_CTRLMSG_Reject:
+                    printf("(Reject)");
                     break;
                     
                 case USBPD_CTRLMSG_PS_RDY:

@@ -299,9 +299,11 @@ void ALARM_MANAGEMENT(uint8_t Usb_Port)
                         break;
                         
                     case USBPD_CTRLMSG_Accept:
+                        PostProcess_Msg_Accept++;
                         break;
                         
                     case USBPD_CTRLMSG_Reject:
+                        PostProcess_Msg_Reject++;
                         break;
                         
                     case USBPD_CTRLMSG_PS_RDY:
@@ -812,4 +814,57 @@ void Clear_PDO_FROM_SRC(uint8_t Usb_Port)
     }
     
     Nego_RDO.d32 = 0;
+}
+
+#define PD_HEADER_SOFTRESET 0x000D
+
+int PdMessage_SoftReset()
+{
+    //Sink send "Soft_reset" message to Source:
+    //Set TX_header to soft reset: @x51 = x0D
+    //Send PD_command: @x1A = x26
+    
+    int status = 0;
+    uint8_t UsbPort = 0;
+    volatile int Timeout; //to be implemeted
+    
+    //-------------------------------------
+    
+    uint16_t Data16 = PD_HEADER_SOFTRESET;
+    uint8_t Data8[2];
+    Data8[0] = Data16 & 0xFF;
+    Data8[1] = (Data16 >> 8) & 0xFF;
+    status = I2C_Write_USB_PD(STUSB45DeviceConf[UsbPort].I2cBus, STUSB45DeviceConf[UsbPort].I2cDeviceID_7bit, TX_HEADER, (uint8_t *)&Data8, 2 );
+    if(status != 0) { return -1; }
+    
+    //-------------------------------------
+    
+    PostProcess_Msg_Accept = 0; //clear
+    PostProcess_Msg_Reject = 0;  //clear
+    Timeout = 0;  //clear
+    
+    //-------------------------------------
+    
+    uint8_t New_CMD = 0x26;
+    status = I2C_Write_USB_PD(STUSB45DeviceConf[UsbPort].I2cBus, STUSB45DeviceConf[UsbPort].I2cDeviceID_7bit, STUSB_GEN1S_CMD_CTRL, &New_CMD, 1 );
+    if(status != 0) { return -1; }
+    
+    //-------------------------------------
+    
+    while( (PostProcess_Msg_Accept == 0) && (PostProcess_Msg_Reject == 0) && (Timeout == 0)); //wait PD message is accepted by SOURCE
+    
+    //-------------------------------------
+    
+    if( PostProcess_Msg_Accept > 0)
+    {
+        return 0; //OK
+    }
+    else if( PostProcess_Msg_Reject > 0)
+    {
+        return -2; //Error
+    }
+    else
+    {
+        return -3; //Error
+    }
 }

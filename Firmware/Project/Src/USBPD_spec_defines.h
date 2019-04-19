@@ -56,6 +56,13 @@
 #define USBPD_FIXPDOSRC_MaximumCurrent_in10mA_units(x) ( x & 0x3FF)         //Bits 9..0
 
 
+//Table 6-11 Variable Supply (non-Battery) PDO - Source
+//...
+
+//Table 6-12 Battery Supply PDO - Source
+//...
+
+
 //Table 6-14 Fixed Supply PDO - Sink
 #define USBPD_FIXPDOSNK_MASK_FixedSupply                (0x3 << 30)  //Bits 31..30
 #define USBPD_FIXPDOSNK_MASK_DualRolePower              (0x1 << 29)  //Bits 29

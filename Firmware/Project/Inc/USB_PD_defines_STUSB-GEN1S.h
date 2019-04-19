@@ -437,7 +437,9 @@ typedef enum
 #define RX_DATA_OBJ7          0x4B  //(32bit)
 
 #define TX_BYTE_CNT            0x50
+#define TX_HEADER              0x51 //16bit
 #define TX_HEADER_LOW          0x51
+#define TX_HEADER_HIGH         0x52
 #define TX_DATA_OBJ1          0x53
 #define TX_DATA_OBJ2          0x57
 #define TX_DATA_OBJ3          0x5B
@@ -488,6 +490,7 @@ typedef union
     
   }USB_PD_SNK_PDO_TypeDef;
 
+#define DPM_REQ_RDO 0x91 //32bits
 #define RDO_REG_STATUS 0x91 
 typedef union
 {
