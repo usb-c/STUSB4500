@@ -56,8 +56,8 @@ Thanks to its 20 V technology, it implements high voltage features to protect th
 ## Programming
 
 ### Register Programming
-The USB-PD chip has 148 registers (0x94).  <br/>
-Use the firmware example contained in this repository (STSW-STUSB003 Software library for STUSB4500) to control the STUSB4500 with a Micro-controller, and take control over the default behavior of the device.
+The USB-PD chip has 148 programmable registers (0x94).  <br/>
+To simplify the implementation, Use the firmware example contained in this repository (STSW-STUSB003 Software library for STUSB4500) to control the STUSB4500 with a Micro-controller, and take control over the default behavior of the device.
 You can for instance with the MCU request any PDO that you want from the DFP (you are no more limited to 3 PDOs).
 
 Link: [Source code for this project](Firmware/Project/Src)  <br/>
@@ -74,13 +74,17 @@ You can program the chip during manufacturing with any standard programming tool
 
 
 Here are the steps to program the NVM memory:
-1. Use the STSW-STUSB002 GUI to configure the STUSB4500 according to your application needs (PDO, Voltage, Current, Overvoltage protection, …)
-1. With the GUI, generate the NVM config file (.h) which contains the binary configuration of STUSB45
-1. Use the NVM_Library source code (which contains the specific I2C sequence) to write the binary configuration (.h) into the chip NVM memory
+1. Use the STSW-STUSB002 GUI to configure the STUSB4500 parameters according to your application needs (PDO, Voltage, Current, Overvoltage protection, …).   <br/>
+Note that the GUI can be used offline for the parameters selection (i.e. without being connected physically to STUSB4500).
+1. With the GUI, generate the NVM config file (.h) (or .txt) which contains the binary configuration of STUSB45
+1. Use the NVM_Library source code (which contains the specific I2C sequence) to create an application which writes the binary configuration (.h) into the chip NVM memory
 1. Reset the chip so that it reloads its latest NVM configuration
+1. Now the chip is programmed. Each time it starts up, it will load the configuration from the NVM memory.
 
+* Note 1 : In a typical application, the chip's NVM only needs to be programmed once (during manufacturing).
+* Note 2 : The NVM technology has a limited number of write cycles possible (few thousands). So do not use an application which re-write the NVM all the time.
 
-## Evaluation Board
+## Evaluation Boards
 There are different boards available to test the product.
 
 * STUSB4500 evaluation board : STEVAL-ISC005V1   <br/>
@@ -89,6 +93,7 @@ https://www.st.com/content/st_com/en/products/evaluation-tools/solution-evaluati
   * Note : This board requires to be connected on top of a STM32 Nucleo board : NUCLEO-F072RB or NUCLEO-G071RB <br/>
 https://www.st.com/en/evaluation-tools/nucleo-f072rb.html <br/>
 https://www.st.com/en/evaluation-tools/nucleo-g071rb.html <br/>
+To use the GUI with these boards, flash the STM32 with the corresponding binary file.  <br/>
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/usb-c/STUSB4500/master/Pics/en.steval-isc005v1_image.jpg" width="200">
@@ -119,6 +124,13 @@ https://www.coolgear.com/product/nano-usb-pd-to-dc-module-pd-negotiation-device
 alt="IMAGE ALT TEXT HERE" width="350" border="10" /></a>
    <a href="http://www.youtube.com/watch?feature=player_embedded&v=Sld2pj-_ho0
 " target="_blank"><img src="http://img.youtube.com/vi/Sld2pj-_ho0/0.jpg" 
+alt="IMAGE ALT TEXT HERE" width="350" border="10" /></a>
+</p>
+
+
+<p align="center">
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=0-J0FWWDuRg
+" target="_blank"><img src="http://img.youtube.com/vi/0-J0FWWDuRg/0.jpg" 
 alt="IMAGE ALT TEXT HERE" width="350" border="10" /></a>
 </p>
 
