@@ -77,7 +77,7 @@ The NVM programming is done through I2C. <br/>
 You can program the chip during manufacturing with any standard programming tool, as long as the tool has access to the I2C interface.
 
 
-Here are the steps to program the NVM memory:
+#### Here are the steps to program the NVM memory (with your own tools):
 1. Use the STSW-STUSB002 GUI to configure the STUSB4500 parameters according to your application needs (PDO, Voltage, Current, Overvoltage protection, …).   <br/>
 Note that the GUI can be used offline for the parameters selection (i.e. without being connected physically to STUSB4500).
 1. With the GUI, generate the NVM config file (.h) (or .txt) which contains the binary configuration of STUSB45
@@ -87,6 +87,14 @@ Note that the GUI can be used offline for the parameters selection (i.e. without
 
 * Note 1 : In a typical application, the chip's NVM only needs to be programmed once (during manufacturing).
 * Note 2 : The NVM technology has a limited number of write cycles possible (few thousands). So do not use an application which re-write the NVM all the time.
+
+
+#### Here is a Faster alternative to program the NVM memory (with the GUI and Nucleo board):
+1. Connect the STUSB4500 eval board on top of STM32F072 Nucleo board. And connect the Nucleo board to your computer via USB.
+1. Use the STSW-STUSB002 GUI to configure the STUSB4500 parameters according to your application needs (PDO, Voltage, Current, Overvoltage protection, …).   <br/>
+1. With the GUI, click the "Write NVM" button to flash the memory
+1. Reset the chip so that it reloads its latest NVM configuration
+
 
 ## Evaluation Boards
 There are different boards available to test the product.
