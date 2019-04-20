@@ -15,18 +15,18 @@ Info:
 ----------------
 * __Device:__       STUSB4500 -> USB PD controller  <br />
 * __Manufacturer:__ STMicroelectronics
+* __Typical Application:__ To get automatically higher power on Vbus at the insertion of USB-C cable.
 * __USB power role:__ Power SINK
 * __USB data  role:__ independant (works with No Data, or with UFP (USB Device) that can be USB2.0 or USB3.1)   <br />
 Note: If using the USB-C connector for both Power and Data (with STUSB4500 controller for Power communication on one side, and a USB Data controller on the other side), then the USB-C specification requires for a Power Sink application, that its initial data role (at cable attachment) is always UFP (Device).  <br />
 Similarly, the initial data role of a Power Source application is always DFP (Host). <br />
 To change the role, it is needed to send a USB PD command: PowerRole_Swap or DataRole_Swap.
 
-* __Typical Application:__ To Get automatically higher power on Vbus at the insertion of USB-C cable.
 * __Features:__ Autonomous, configurable, easy to use, small footprint <br />
 * __Operating supply:__ 5V to 20V directly from Vbus of the USB-C cable. <br /> Or a lower power (3.3V) for battery supplied applications <br />
 * __Package:__ QFN-24, WLCSP MSL1 <br />
 * __Part number:__ STUSB4500QTR, STUSB4500BJR
-* __Spec:__ USB-C v1.2 , USB PD v2.0 & v3.0
+* __USB Spec:__ USB Type-C v1.2 , USB PD v2.0 & v3.0
 
 ## Presentation
 The STUSB4500 is a USB power delivery controller that addresses sink devices. It implements a proprietary algorithm to allow the negotiation of a power delivery contract with a source without MCU support (auto-run mode). PDO profiles are configured in an integrated non-volatile memory. <br/>
