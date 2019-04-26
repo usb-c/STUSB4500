@@ -152,7 +152,7 @@ alt="IMAGE ALT TEXT HERE" width="350" border="10" /></a>
 
 ## Notes
 The STUSB45 is a standalone USB-C PD controller for UFP only (Power SINK). <br/>
-It's counter part for DFP only (Power SOURCE) is STUSB47. <br/>
+Its counter part for DFP only (Power SOURCE) is STUSB47. <br/>
 Because these 2 devices have been certified by USB-IF, it means they are interoperable with any USB-C PD application on the market. <br/>
 Plenty of scenarios are possible, for instance:  <br/>
 
@@ -166,5 +166,5 @@ Plenty of scenarios are possible, for instance:  <br/>
 | STM32G0xx |   <---------->  |   STUSB45 |
 | STUSB47x0 |   <---------->  | STM32Fx + STUSB45 |
 | STUSB47x0 |   <---------->  | STM32MP1 + STUSB45 |
-| STM32MP1 + STUSB1602 |   <---------->  |   STUSB45 |
+| STM32MP1 + STUSB1600 |   <---------->  |   STUSB45 |
 
