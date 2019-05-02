@@ -231,6 +231,7 @@ int CheckCableAttachementStatus(void);
 void Clear_PDO_FROM_SRC(uint8_t Usb_Port);
 void Print_PDO_Voltage(void);
 
+int Change_PDO_WithoutLosingVbus(unsigned int New_PDO_Voltage);
 int PdMessage_SoftReset();
 
 #ifdef __cplusplus

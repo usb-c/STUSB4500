@@ -250,7 +250,10 @@ void ALARM_MANAGEMENT(uint8_t Usb_Port)
                     {
                     case USBPD_DATAMSG_Source_Capabilities :
                         {
-                            static int i ,j ;
+                            // Warning: Short Timing !
+                            // There is ~2 ms timeframe to read the SourceCap, before the next Message ("Accept") arrives and overwrites the first bytes of RX_DATA_OBJ register
+                            
+                            int i ,j ;
                             
                             Status = I2C_Read_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit ,RX_DATA_OBJ ,&DataRW[0], Header.b.NumberOfDataObjects * 4 );
                             
@@ -270,11 +273,13 @@ void ALARM_MANAGEMENT(uint8_t Usb_Port)
                         
                     case USBPD_DATAMSG_Request:  /* get request message */
                         break;
+                        
                     case USBPD_DATAMSG_Sink_Capabilities: /* receive Sink cap  */
                         break;
                         
                     case USBPD_DATAMSG_Vendor_Defined:  /* VDM message */ 
                         break;
+                        
                     default :
                         break;
                     }
@@ -452,14 +457,14 @@ void Print_SNK_PDO(uint8_t Usb_Port)
             break;
         case 2: /* Battery Supply */
             {
-                static float PDO_V_Min;
-                static float PDO_V_Max;
-                static int   PDO_P;          
+                float PDO_V_Min;
+                float PDO_V_Max;
+                float PDO_P;          
                 PDO_V_Max = (float) (PDO_SNK[Usb_Port][i].bat.Max_Voltage)/20.0f;
                 PDO_V_Min = (float) (PDO_SNK[Usb_Port][i].bat.Min_Voltage)/20.0f;
                 PDO_P = (float) (PDO_SNK[Usb_Port][i].bat.Operating_Power)/4.0f; 
 #ifdef PRINTF   
-                printf(" -Battery PDO%u=(%4.2fV, %4.2fV, = %uW)\r\n",i+1, PDO_V_Min, PDO_V_Max, PDO_P );
+                printf(" -Battery PDO%u=(%4.2fV, %4.2fV, = %4.2fW)\r\n",i+1, PDO_V_Min, PDO_V_Max, PDO_P );
 #endif 
                 if (PDO_P >=MAX_POWER)
                 { MAX_POWER = PDO_P;}
@@ -507,7 +512,7 @@ int Get_RDO(uint8_t UsbPort, int * out_PDO_nb , int * out_Voltage_mV, int * out_
         *out_Current_mA = OpCurrent_mA;
         *out_MaxCurrent_mA = MaxCurrent_mA;
     }
-
+    
 #if 0 //to test
     status = I2C_Read_USB_PD(STUSB45DeviceConf[UsbPort].I2cBus,STUSB45DeviceConf[UsbPort].I2cDeviceID_7bit , STUSB_GEN1S_MONITORING_CTRL_1 ,&Buffer, 1 );
     if(status != 0) { return -1; }
@@ -519,9 +524,9 @@ int Get_RDO(uint8_t UsbPort, int * out_PDO_nb , int * out_Voltage_mV, int * out_
     *out_Voltage_mV = 0;
     if(PDO_number >=1)
     {
-    int idx = PDO_number - 1;
-    int PDO_mV = (PDO_FROM_SRC[UsbPort][idx].fix.Voltage)*50; // *1000/20 = 50;
-    *out_Voltage_mV = PDO_mV;
+        int idx = PDO_number - 1;
+        int PDO_mV = (PDO_FROM_SRC[UsbPort][idx].fix.Voltage)*50; // *1000/20 = 50;
+        *out_Voltage_mV = PDO_mV;
     }
     
     
@@ -588,7 +593,7 @@ void Print_PDO_Voltage(void)
 {
     int Usb_Port=0;
     uint8_t Buffer = 0;
-
+    
     I2C_Read_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit , STUSB_GEN1S_MONITORING_CTRL_1 ,&Buffer, 1 );
     
 #ifndef USE_FLOAT
@@ -666,17 +671,17 @@ int Get_current_Sink_PDO_Numb(uint8_t UsbPort, uint8_t * out_PDO_Count)
     if(out_PDO_Count == NULL)
         return -2;
     
-        //PDO_Count = PDO_SNK_NUMB[UsbPort];
-        Status = I2C_Read_USB_PD(STUSB45DeviceConf[UsbPort].I2cBus, STUSB45DeviceConf[UsbPort].I2cDeviceID_7bit, DPM_PDO_NUMB, &PDO_Count, 1 ); 
-        
-        if(Status == 0) 
-        { 
-            *out_PDO_Count = PDO_Count;
-        }
-        else
-        {
-            *out_PDO_Count = 0; //error
-        }
+    //PDO_Count = PDO_SNK_NUMB[UsbPort];
+    Status = I2C_Read_USB_PD(STUSB45DeviceConf[UsbPort].I2cBus, STUSB45DeviceConf[UsbPort].I2cDeviceID_7bit, DPM_PDO_NUMB, &PDO_Count, 1 ); 
+    
+    if(Status == 0) 
+    { 
+        *out_PDO_Count = PDO_Count;
+    }
+    else
+    {
+        *out_PDO_Count = 0; //error
+    }
     
     return Status;
 }
@@ -810,10 +815,27 @@ void Clear_PDO_FROM_SRC(uint8_t Usb_Port)
     
     for(int i=0; i< SRC_PDO_NUM_MAX; i++)
     {
-      PDO_FROM_SRC[Usb_Port][i].d32 = 0;
+        PDO_FROM_SRC[Usb_Port][i].d32 = 0;
     }
     
     Nego_RDO.d32 = 0;
+}
+
+int Change_PDO_WithoutLosingVbus(unsigned int New_PDO_Voltage)
+{
+    int Usb_Port = 0;
+    
+    if( (New_PDO_Voltage < 5000) || (New_PDO_Voltage > 20000) )
+    {
+        return -1; //Error, incorrect parameter
+    }
+    
+    Update_Valid_PDO_Number( Usb_Port, 2 );
+    Update_PDO(Usb_Port, 1, 5000, 1500);
+    Update_PDO(Usb_Port, 2, New_PDO_Voltage, 1000); 
+    PdMessage_SoftReset(); //force the new PDO negociation, by resetting the Source (Vbus is not lost during the reset)
+    
+    return 0; //OK
 }
 
 #define PD_HEADER_SOFTRESET 0x000D
@@ -827,44 +849,57 @@ int PdMessage_SoftReset()
     int status = 0;
     uint8_t UsbPort = 0;
     volatile int Timeout; //to be implemeted
+    uint8_t Data;
     
     //-------------------------------------
     
-    uint16_t Data16 = PD_HEADER_SOFTRESET;
-    uint8_t Data8[2];
-    Data8[0] = Data16 & 0xFF;
-    Data8[1] = (Data16 >> 8) & 0xFF;
-    status = I2C_Write_USB_PD(STUSB45DeviceConf[UsbPort].I2cBus, STUSB45DeviceConf[UsbPort].I2cDeviceID_7bit, TX_HEADER, (uint8_t *)&Data8, 2 );
+    // read CC pin Attachement status
+    status = I2C_Read_USB_PD(STUSB45DeviceConf[UsbPort].I2cBus,STUSB45DeviceConf[UsbPort].I2cDeviceID_7bit ,PORT_STATUS ,&Data, 1);
     if(status != 0) { return -1; }
     
-    //-------------------------------------
-    
-    PostProcess_Msg_Accept = 0; //clear
-    PostProcess_Msg_Reject = 0;  //clear
-    Timeout = 0;  //clear
-    
-    //-------------------------------------
-    
-    uint8_t New_CMD = 0x26;
-    status = I2C_Write_USB_PD(STUSB45DeviceConf[UsbPort].I2cBus, STUSB45DeviceConf[UsbPort].I2cDeviceID_7bit, STUSB_GEN1S_CMD_CTRL, &New_CMD, 1 );
-    if(status != 0) { return -1; }
-    
-    //-------------------------------------
-    
-    while( (PostProcess_Msg_Accept == 0) && (PostProcess_Msg_Reject == 0) && (Timeout == 0)); //wait PD message is accepted by SOURCE
-    
-    //-------------------------------------
-    
-    if( PostProcess_Msg_Accept > 0)
+    if( (Data & STUSBMASK_ATTACHED_STATUS) == VALUE_ATTACHED) //only if cable attached
     {
-        return 0; //OK
-    }
-    else if( PostProcess_Msg_Reject > 0)
-    {
-        return -2; //Error
+        uint16_t Data16 = PD_HEADER_SOFTRESET;
+        uint8_t Data8[2];
+        Data8[0] = Data16 & 0xFF;
+        Data8[1] = (Data16 >> 8) & 0xFF;
+        status = I2C_Write_USB_PD(STUSB45DeviceConf[UsbPort].I2cBus, STUSB45DeviceConf[UsbPort].I2cDeviceID_7bit, TX_HEADER, (uint8_t *)&Data8, 2 );
+        if(status != 0) { return -1; }
+        
+        //-------------------------------------
+        
+        PostProcess_Msg_Accept = 0; //clear
+        PostProcess_Msg_Reject = 0;  //clear
+        Timeout = 0;  //clear
+        
+        //-------------------------------------
+        
+        uint8_t New_CMD = 0x26;
+        status = I2C_Write_USB_PD(STUSB45DeviceConf[UsbPort].I2cBus, STUSB45DeviceConf[UsbPort].I2cDeviceID_7bit, STUSB_GEN1S_CMD_CTRL, &New_CMD, 1 );
+        if(status != 0) { return -1; }
+        
+        //-------------------------------------
+        
+        while( (PostProcess_Msg_Accept == 0) && (PostProcess_Msg_Reject == 0) && (Timeout == 0)); //wait PD message is accepted by SOURCE
+        
+        //-------------------------------------
+        
+        if( PostProcess_Msg_Accept > 0)
+        {
+            return 0; //OK
+        }
+        else if( PostProcess_Msg_Reject > 0)
+        {
+            return -3; //Error
+        }
+        else
+        {
+            return -4; //Error
+        }
+        
     }
     else
     {
-        return -3; //Error
+        return -2; //Error, cable not attached
     }
 }

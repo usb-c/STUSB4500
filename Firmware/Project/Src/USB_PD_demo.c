@@ -2,6 +2,8 @@
 #include "USB_PD_demo.h"
 #include "USB_PD_core.h"
 
+#include "PostProcessEvents.h"
+
 //Demo USB PD clicker
 //Example to automatically select the next PDO from Source, each time we press the Button
 
@@ -17,6 +19,7 @@ int Select_Next_PDO_SRC(uint8_t UsbPort, int * out_NewPDO_mV)
     uint8_t PDO_SNK_selected;
     int PDO_count = 0;
     int status = -1;
+    volatile int Timeout = 0; //to be implemented
     
     if(PDO_FROM_SRC_Num[UsbPort] >= 1 )
     {
@@ -53,8 +56,24 @@ int Select_Next_PDO_SRC(uint8_t UsbPort, int * out_NewPDO_mV)
         
         Update_PDO( UsbPort, PDO_SNK_selected , PDO_mV , PDO_I_mA );
         Update_Valid_PDO_Number(UsbPort, PDO_count);
+        
+        
+        //Reset to take into account the new PDO
+        //-----------------------------------
+        
+#if 1  //PD Protocol reset: VBUS is kept alive
+        PostProcess_PSRDY_Received = 0;  //clear
+        
+        status = PdMessage_SoftReset();
+        if(status != 0) return -3; //Error, SoftReset was rejected by SRC
+        
+        while( (PostProcess_PSRDY_Received == 0) && (Timeout == 0) ); //wait VBUS Voltage ready
+        
+#else  //Chip reset: VBUS is lost for 1sec
         SW_reset_by_Reg(UsbPort);
         usb_pd_init(UsbPort); //refresh main registers & IRQ mask init needed after reset
+#endif
+        //-----------------------------------
         
         if(out_NewPDO_mV != NULL)
         {
