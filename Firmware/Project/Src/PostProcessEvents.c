@@ -172,6 +172,9 @@ int PostProcess_UsbEvents()
         {
             Clear_PDO_FROM_SRC(0);
             printf("Not-attached ");
+            
+            Status = SW_reset_by_Reg(Usb_Port); //workaround only if the VSEL_PDO register will be used at the next Cable attachement.
+            //usb_pd_init(Usb_Port); //refresh main registers & IRQ mask init after reset
         }
         
         printf("\r\n");
