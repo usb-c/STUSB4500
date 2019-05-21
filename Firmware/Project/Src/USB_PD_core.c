@@ -154,10 +154,9 @@ device interrupt Handler
 void ALARM_MANAGEMENT(uint8_t Usb_Port)   
 {
     int i,Status;
-    //static unsigned char DataRead,DataWrite=0;
     STUSB_GEN1S_ALERT_STATUS_RegTypeDef Alert_Status;
     STUSB_GEN1S_ALERT_STATUS_MASK_RegTypeDef Alert_Mask;
-    static unsigned char DataRW[40];
+    unsigned char DataRW[40];
     
     
     //if ( HAL_GPIO_ReadPin(ALERT_A_GPIO_Port,ALERT_A_Pin)== GPIO_PIN_RESET)
@@ -167,8 +166,6 @@ void ALARM_MANAGEMENT(uint8_t Usb_Port)
     Status = I2C_Read_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit ,Address ,&DataRW[0], 2 );
     Alert_Mask.d8 = DataRW[1]; 
     Alert_Status.d8 = DataRW[0] & ~Alert_Mask.d8;
-    //       printf("\r\n read Status : 0x%04x", (uint16_t)DataRW[1] |DataRW[0]<<8  );
-    //                printf("AL status:0x%x Mask:0x%x\n",DataRW[0],DataRW[1]);
     
     
 #ifdef DEBUG_IRQ
@@ -181,7 +178,7 @@ void ALARM_MANAGEMENT(uint8_t Usb_Port)
         PD_status[Usb_Port].HW_Reset = (DataRW[ 0 ] >> 7);
         if (PD_status[Usb_Port].HW_Reset !=0)
         {
-            //printf("HW RESET");
+            PostProcess_IrqHardreset++;
         }
         
         //bit 6
@@ -194,7 +191,7 @@ void ALARM_MANAGEMENT(uint8_t Usb_Port)
             
             if( (DataRW[0] & STUSBMASK_ATTACH_STATUS_TRANS) != 0)
             {
-                PostProcess_AttachTransition = 1;
+                PostProcess_AttachTransition++;
             }
             
         }
@@ -250,8 +247,8 @@ void ALARM_MANAGEMENT(uint8_t Usb_Port)
                     {
                     case USBPD_DATAMSG_Source_Capabilities :
                         {
-                            // Warning: Short Timing !
-                            // There is ~2 ms timeframe to read the SourceCap, before the next Message ("Accept") arrives and overwrites the first bytes of RX_DATA_OBJ register
+                            // Warning: Short Timing
+                            // There is ~3 ms timeframe to read the SourceCap, before the next Message ("Accept") arrives and overwrites the first bytes of RX_DATA_OBJ register
                             
                             int i ,j ;
                             
@@ -287,7 +284,6 @@ void ALARM_MANAGEMENT(uint8_t Usb_Port)
                 else  //Number_of_Data_Objects field == 0 --> Message is a Control-Message
                 {
                     __NOP();
-                    // printf("Ctrl Message :0x%04x \r\n",Header.d16);
                     
 #ifdef DEBUG_IRQ
                     Push_PD_MessageReceived('C', Header.b.MessageType); //CtrlMsg
@@ -295,12 +291,11 @@ void ALARM_MANAGEMENT(uint8_t Usb_Port)
                     
                     switch (Header.b.MessageType )
                     {   
-                        //printf(":%i--\r\n",Header.bitfield.MessageType);
                     case USBPD_CTRLMSG_Reserved1:
                         break;
                         
                     case USBPD_CTRLMSG_GoodCRC:
-                        //printf("GoodCRC ");
+                        PostProcess_Msg_GoodCRC++;
                         break;
                         
                     case USBPD_CTRLMSG_Accept:
@@ -824,6 +819,7 @@ void Clear_PDO_FROM_SRC(uint8_t Usb_Port)
 int Change_PDO_WithoutLosingVbus(unsigned int New_PDO_Voltage)
 {
     int Usb_Port = 0;
+    int status = 0;
     
     if( (New_PDO_Voltage < 5000) || (New_PDO_Voltage > 20000) )
     {
@@ -833,7 +829,29 @@ int Change_PDO_WithoutLosingVbus(unsigned int New_PDO_Voltage)
     Update_Valid_PDO_Number( Usb_Port, 2 );
     Update_PDO(Usb_Port, 1, 5000, 1500);
     Update_PDO(Usb_Port, 2, New_PDO_Voltage, 1000); 
-    PdMessage_SoftReset(); //force the new PDO negociation, by resetting the Source (Vbus is not lost during the reset)
+    status = PdMessage_SoftReset(); //force the new PDO negociation, by resetting the Source (Vbus is not lost during the reset)
+    
+    if(status != 0) return status;
+    
+    return 0; //OK
+}
+
+int Change_PDO_WithoutLosingVbus_WithTimeout(unsigned int New_PDO_Voltage)
+{
+    int Usb_Port = 0;
+    int status = 0;
+    
+    if( (New_PDO_Voltage < 5000) || (New_PDO_Voltage > 20000) )
+    {
+        return -1; //Error, incorrect parameter
+    }
+    
+    Update_Valid_PDO_Number( Usb_Port, 2 );
+    Update_PDO(Usb_Port, 1, 5000, 1500);
+    Update_PDO(Usb_Port, 2, New_PDO_Voltage, 1000); 
+    status = PdMessage_SoftReset_WithTimeout(); //force the new PDO negociation, by resetting the Source (Vbus is not lost during the reset)
+    
+    if(status != 0) return status;
     
     return 0; //OK
 }
@@ -848,8 +866,50 @@ int PdMessage_SoftReset()
     
     int status = 0;
     uint8_t UsbPort = 0;
-    volatile int Timeout; //to be implemeted
     uint8_t Data;
+    
+    //-------------------------------------
+    
+    // read CC pin Attachement status
+    status = I2C_Read_USB_PD(STUSB45DeviceConf[UsbPort].I2cBus,STUSB45DeviceConf[UsbPort].I2cDeviceID_7bit ,PORT_STATUS ,&Data, 1);
+    if(status != 0) { return -1; }
+    
+    if( (Data & STUSBMASK_ATTACHED_STATUS) == VALUE_ATTACHED) //only if cable attached
+    {
+        uint16_t Data16 = PD_HEADER_SOFTRESET;
+        uint8_t Data8[2];
+        Data8[0] = Data16 & 0xFF;
+        Data8[1] = (Data16 >> 8) & 0xFF;
+        status = I2C_Write_USB_PD(STUSB45DeviceConf[UsbPort].I2cBus, STUSB45DeviceConf[UsbPort].I2cDeviceID_7bit, TX_HEADER, (uint8_t *)&Data8, 2 );
+        if(status != 0) { return -1; }
+        
+        //-------------------------------------
+        
+        uint8_t New_CMD = 0x26;
+        status = I2C_Write_USB_PD(STUSB45DeviceConf[UsbPort].I2cBus, STUSB45DeviceConf[UsbPort].I2cDeviceID_7bit, STUSB_GEN1S_CMD_CTRL, &New_CMD, 1 );
+        if(status != 0) { return -1; }
+    }
+    else
+    {
+        return -2; //Error, cable not attached
+    }
+    
+    return 0;  //OK
+}
+
+int PdMessage_SoftReset_WithTimeout()
+{
+    //Sink send "Soft_reset" message to Source:
+    //Set TX_header to soft reset: @x51 = x0D
+    //Send PD_command: @x1A = x26
+    
+    int status = 0;
+    uint8_t UsbPort = 0;
+    volatile int TimeoutEvent;
+    uint8_t Data;
+    
+    uint32_t Tickstart = 0U;
+    uint32_t TimeoutValue = 1000; //ms
     
     //-------------------------------------
     
@@ -870,7 +930,10 @@ int PdMessage_SoftReset()
         
         PostProcess_Msg_Accept = 0; //clear
         PostProcess_Msg_Reject = 0;  //clear
-        Timeout = 0;  //clear
+        TimeoutEvent = 0;  //clear
+        
+        /* Init tickstart for timeout management*/
+        Tickstart = HAL_GetTick();
         
         //-------------------------------------
         
@@ -880,7 +943,15 @@ int PdMessage_SoftReset()
         
         //-------------------------------------
         
-        while( (PostProcess_Msg_Accept == 0) && (PostProcess_Msg_Reject == 0) && (Timeout == 0)); //wait PD message is accepted by SOURCE
+        while( (PostProcess_Msg_Accept == 0) && (PostProcess_Msg_Reject == 0) && (TimeoutEvent == 0)) //wait PD message is accepted by SOURCE
+        {
+            /* Check for the TimeoutEvent */
+            if((HAL_GetTick() - Tickstart) > TimeoutValue)
+            {
+                TimeoutEvent = 1;
+            }
+            
+        }
         
         //-------------------------------------
         
@@ -892,9 +963,13 @@ int PdMessage_SoftReset()
         {
             return -3; //Error
         }
-        else
+        else if( TimeoutEvent > 0)
         {
             return -4; //Error
+        }
+        else
+        {
+            return -5; //Error
         }
         
     }
@@ -903,3 +978,4 @@ int PdMessage_SoftReset()
         return -2; //Error, cable not attached
     }
 }
+

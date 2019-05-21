@@ -232,7 +232,10 @@ void Clear_PDO_FROM_SRC(uint8_t Usb_Port);
 void Print_PDO_Voltage(void);
 
 int Change_PDO_WithoutLosingVbus(unsigned int New_PDO_Voltage);
+int Change_PDO_WithoutLosingVbus_WithTimeout(unsigned int New_PDO_Voltage);
 int PdMessage_SoftReset();
+int PdMessage_SoftReset_WithTimeout();
+
 
 #ifdef __cplusplus
 }

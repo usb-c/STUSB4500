@@ -209,11 +209,13 @@ int main(void)
         Print_RDO(Usb_Port);
     }
     
-#if defined(VBUS_POWERED_APPLICATION)
-    printf("PD Source SW-RESET ");
-    PdMessage_SoftReset(); //To make the Source send its PDO Capabilities
-    
-#else //BATTERY_POWERED_APPLICATION
+    if(CableAttached == 1) //VBUS_POWERED_APPLICATION
+    {
+    printf("Power Source SW-RESET ...");
+    PdMessage_SoftReset_WithTimeout(); //To make the Source send its PDO Capabilities
+    }
+    else
+    {
     
 #ifdef USE_RESET_PIN
     printf("Resetting the STUSB4500 (Hard-RESET) \r\n");
@@ -221,22 +223,39 @@ int main(void)
     
 #else
     printf("STUSB4500 SW-RESET ");
-    SW_reset_by_Reg(Usb_Port);
+    Status = SW_reset_by_Reg(Usb_Port);
+    usb_pd_init(Usb_Port); //refresh main registers & IRQ mask init needed after reset
     Status = I2C_Read_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit,REG_DEVICE_ID ,&Cut[Usb_Port], 1 );
 #endif
+    }
     
-#endif
     
     Print_PDO_FROM_SRC(Usb_Port);
     
-    printf("Changing the PDOs ... \r\n");
+    printf("Changing the Sink PDOs ... \r\n");
     Update_Valid_PDO_Number( Usb_Port, 3 );
     Update_PDO(Usb_Port,1,5000,1500);
     Update_PDO(Usb_Port,2,9000,1000);
     Update_PDO(Usb_Port,3,20000,1000);   
+
+    if(CableAttached == 1)
+    {
+      PdMessage_SoftReset_WithTimeout(); //To force negociation with the new Sink PDO
+    }
+    else
+    {
+    
+#ifdef USE_RESET_PIN
+    //printf("Resetting the STUSB4500 (Hard-RESET) \r\n");
+    HW_Reset_state(Usb_Port);
+
+#else
+    //printf("STUSB4500 SW-RESET ");
     Status = SW_reset_by_Reg(Usb_Port);
     usb_pd_init(Usb_Port); //refresh main registers & IRQ mask init needed after reset
-    
+    Status = I2C_Read_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit,REG_DEVICE_ID ,&Cut[Usb_Port], 1 );
+#endif
+    }
     
     Read_SNK_PDO(Usb_Port);
     
@@ -261,15 +280,14 @@ int main(void)
 #if 0
             push_button_Action(); 
 #else
-            push_button_Action2();
+            push_button_Action2(); //PDO clicker
 #endif
         }
         
         
 #ifdef DEMO_PDO_ROLLING  // Define to enable the STUSB4500_PDO_rolling_DEMO
-        // UNCOMMENT the bellow 2 lines in order to enable the STUSB4500_PDO_rolling_DEMO
-        //    if( Timer_Action_Flag[Usb_Port] == 1  )
-        //      Timer_Action();          
+        if( Timer_Action_Flag[Usb_Port] == 1  )
+        Timer_Action();
 #endif
         
     }

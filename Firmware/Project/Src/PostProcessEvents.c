@@ -5,11 +5,14 @@
 
 volatile int PostProcess_IrqReceived = 0;
 volatile int PostProcess_AttachTransition = 0;
+volatile int PostProcess_IrqHardreset = 0;
 volatile int PostProcess_PD_MessageReceived = 0;
 volatile int PostProcess_SRC_PDO_Received = 0;
 volatile int PostProcess_PSRDY_Received = 0;
 volatile int PostProcess_Msg_Accept = 0;
 volatile int PostProcess_Msg_Reject = 0;
+volatile int PostProcess_Msg_GoodCRC = 0;
+
 
 
 
@@ -145,9 +148,11 @@ int PostProcess_UsbEvents()
     }
     
     
-    if( PostProcess_AttachTransition == 1)
+    if( PostProcess_AttachTransition != 0)
     {
-        PostProcess_AttachTransition = 0;
+        __disable_irq(); //CMSIS
+        PostProcess_AttachTransition--;
+        __enable_irq();
         
         //printf("Trans. occurred on ATTACH_STATUS bit: ");
         printf("\r\n=== CABLE: ");
@@ -294,37 +299,14 @@ int PostProcess_UsbEvents()
     
     if( PostProcess_SRC_PDO_Received != 0)
     {
+        __disable_irq(); //CMSIS
         PostProcess_SRC_PDO_Received--;
+        __enable_irq();
+        
         Print_PDO_FROM_SRC(Usb_Port);
         
         //Read_RDO(Usb_Port);
         //Print_RDO(Usb_Port);
-        
-        /*
-        for(int i=0, j=0; i < PDO_FROM_SRC_Num[Usb_Port]; i++, j+=4)
-        {
-        // RcvPacket : Header(16bit) + Object1(32bit) + Object2(32bit) + ...
-        uint32_t MessageRcv32;
-        MessageRcv32 = DataRW[j+0];
-        MessageRcv32 |= DataRW[j+1] << 8;
-        MessageRcv32 |= DataRW[j+2] << 16;
-        MessageRcv32 |= DataRW[j+3] << 24;
-        
-        int tmp32;
-        int Voltage_50mV = USBPD_FIXPDOSRC_Voltage_in50mV_units(MessageRcv32);
-        float Voltage =  Voltage_50mV * 0.050f;
-        
-        int MaximumCurrent_10mV = USBPD_FIXPDOSRC_MaximumCurrent_in10mA_units(MessageRcv32);
-        float MaximumCurrent = MaximumCurrent_10mV * 0.010f;
-        
-        int Peak = USBPD_FIXPDOSRC_PeakCurrent(MessageRcv32);
-        
-        printf("Voltage= %f, ", Voltage);
-        printf("MaximumCurrent= %f, ", MaximumCurrent);
-        printf("Peak= %d ", Peak);
-        printf("\r\n");
-    }
-        */
         
         return 0;
     }
