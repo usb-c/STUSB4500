@@ -76,6 +76,8 @@ The NVM size is 40 bytes.  <br/>
 The NVM programming is done through I2C. <br/>
 You can program the chip during manufacturing with any standard programming tool, as long as the tool has access to the I2C interface.
 
+Link: [Source code for this project](NVM_Flasher)  <br/>
+
 
 #### Here are the steps to program the NVM memory (with your own tools):
 1. Use the STSW-STUSB002 GUI to configure the STUSB4500 parameters according to your application needs (PDO, Voltage, Current, Overvoltage protection, …).   <br/>
