@@ -7,6 +7,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "i2c.h"
+#include <stdio.h> //for printf()
 
 /* USER CODE BEGIN Includes */
 #include "i2c_rw.h"
@@ -17,9 +18,8 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-I2C_HandleTypeDef *hi2c[2];	
-unsigned int I2cDeviceID_7bit;
-unsigned int AddressSize = I2C_MEMADD_SIZE_8BIT;
+extern I2C_HandleTypeDef *hi2c[2];	
+extern unsigned int I2cDeviceID_7bit;
 /* USER CODE END PV */
 
 
@@ -33,7 +33,6 @@ int main_NVM(void)
     hi2c[0]= &hi2c1;
     hi2c[1]= &hi2c2;
     I2cDeviceID_7bit = STUSBxx_DEVICEID_7BIT;
-    AddressSize = I2C_MEMADD_SIZE_8BIT;
     
     
     printf("*** STUSB NVM programming ***\r\n");
@@ -63,11 +62,11 @@ int main_NVM(void)
     {
         uint8_t Buffer;
         status = I2C_Read_USB_PD(0,DEVICE_ID, &Buffer, 1);     //ID=0x21 for STUSB4500
-        if(status != 0)  { printf("Error I2C \r\n"); }
+        if(status != 0)  { printf("Error I2C \r\n"); return -1;}
         
         if(Buffer & ID_Reg >= CUT)  
         {
-            status = nvm_flash(0);
+            status = nvm_flash();
             if ( status != 0) 
                 printf("STUSB Flashing Failed \r\n"); // Port 0 mean I2C1 For I2C2 change to Port 1
             else 
@@ -121,9 +120,9 @@ int main_NVM(void)
         else  printf("NVM read initialization: failed \r\n");
     }
 #endif //VERIFY_NVM
+
     
     /* USER CODE END 2 */
-    
     
     return 0;
 }

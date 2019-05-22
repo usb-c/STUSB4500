@@ -1,5 +1,5 @@
 
-int nvm_flash(uint8_t Port);
+int nvm_flash();
 int nvm_read(unsigned char * pSectorsOut, int SectorsLength);
 
 int CUST_EnterWriteMode(uint8_t Port,unsigned char ErasedSector);

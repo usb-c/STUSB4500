@@ -8,7 +8,7 @@
 #define NVM_SIZE 40
 
 
-int nvm_flash(uint8_t Port)
+int nvm_flash()
 {
     
     if (CUST_EnterWriteMode(0, SECTOR_0 | SECTOR_1  | SECTOR_2 | SECTOR_3  | SECTOR_4 ) != 0 ) return -1;
