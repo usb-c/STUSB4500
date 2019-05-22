@@ -32,14 +32,14 @@
 "101" then Erase
 "110" then Program
 "111" then Soft Programming (to be done after Erasing)*/
-#define READ 0x00
-#define WRITE_PL 0x01
-#define WRITE_SER 0x02
-#define READ_PL	0x03
-#define READ_SER 0x04
-#define ERASE_SECTOR 0x05
-#define PROG_SECTOR 0x06
-#define SOFT_PROG_SECTOR 0x07
+#define READ            0x00 //Read memory array
+#define WRITE_PL        0x01 //Shift In Data on Program Load (PL) Register
+#define WRITE_SER       0x02 //Shift In Data on Sector Erase (SER) Register 
+#define READ_PL	        0x03 //Shift Out Data on Program Load (PL) Register
+#define READ_SER        0x04 //Shift Out Data on sector Erase (SER) Register
+#define ERASE_SECTOR    0x05 //Erase memory array
+#define PROG_SECTOR     0x06 //Program 256b word into EEPROM
+#define SOFT_PROG_SECTOR 0x07 //Soft Program array
         
         #define	SECTOR_0	0x01
 	#define	SECTOR_1	0x02

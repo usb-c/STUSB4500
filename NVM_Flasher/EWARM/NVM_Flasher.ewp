@@ -355,6 +355,7 @@
                     <state>$PROJ_DIR$/../Drivers/STM32F0xx_HAL_Driver/Inc/Legacy</state>
                     <state>$PROJ_DIR$/../Drivers/CMSIS/Device/ST/STM32F0xx/Include</state>
                     <state>$PROJ_DIR$/../Drivers/CMSIS/Include</state>
+                    <state>$PROJ_DIR$\..\Src</state>
                     <state>$PROJ_DIR$\..\Src\NVM</state>
                 </option>
                 <option>
@@ -1055,6 +1056,9 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\Src\main.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Src\NVM\main_NVM.c</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\Src\stm32f0xx_hal_msp.c</name>

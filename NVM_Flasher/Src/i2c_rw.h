@@ -3,9 +3,12 @@
  extern "C" {
 #endif
 
-/* Includes ------------------------------------------------------------------*/
-//#include "stm32f0xx_hal.h"
-//#include "main.h"
+/* Defines ------------------------------------------------------------------*/
+#define STUSBxx_DEVICEID_7BIT  0x28
+#define STUSBxx_DEVICEID_8BIT  0x50
+#define STUSB4500_I2C_DEVID_7BIT  0x28
+#define STUSB4500_I2C_DEVID_8BIT  0x50
+
 
 
 /* USER CODE BEGIN Prototypes */

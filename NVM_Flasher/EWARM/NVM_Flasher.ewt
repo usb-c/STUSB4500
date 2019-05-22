@@ -1208,6 +1208,9 @@
                 <name>$PROJ_DIR$\..\Src\main.c</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\..\Src\NVM\main_NVM.c</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\Src\stm32f0xx_hal_msp.c</name>
             </file>
             <file>
