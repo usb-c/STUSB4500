@@ -229,6 +229,7 @@ void Negotiate_5V(uint8_t Usb_Port);
 //void Print_PDO_FROM_SRC(uint8_t Usb_Port);
 int CheckCableAttachementStatus(void);
 void Clear_PDO_FROM_SRC(uint8_t Usb_Port);
+int Print_TypeC_MaxCurrentAt5V_FROM_SRC(uint8_t Usb_Port);
 void Print_PDO_Voltage(void);
 
 int Change_PDO_WithoutLosingVbus(unsigned int New_PDO_Voltage);

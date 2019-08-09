@@ -137,6 +137,7 @@ void CUST_ReadSector(uint8_t Port,char SectorNum, unsigned char *SectorData)
 
 	Buffer[0]= (READ & FTP_CUST_OPCODE);
 	I2C_Write_USB_PD(Port,FTP_CTRL_1,Buffer,1);/* Set Read Sectors Opcode */
+
 	Buffer[0]= (SectorNum & FTP_CUST_SECT) |FTP_CUST_PWR |FTP_CUST_RST_N | FTP_CUST_REQ;
 	I2C_Write_USB_PD(Port,FTP_CTRL_0,Buffer,1);  /* Load Read Sectors Opcode */
 	do 
@@ -157,11 +158,16 @@ void CUST_WriteSector(uint8_t Port,char SectorNum, unsigned char *SectorData)
 {
 	unsigned char Buffer[2];
 
+//Write the 64-bit data to be written in the sector
 	I2C_Write_USB_PD(Port,RW_BUFFER,SectorData,8);
+
 	Buffer[0]=FTP_CUST_PWR | FTP_CUST_RST_N; /*Set PWR and RST_N bits*/
 	I2C_Write_USB_PD(Port,FTP_CTRL_0,Buffer,1);
+
+    //NVM Program Load Register to write with the 64-bit data to be written in sector
 	Buffer[0]= (WRITE_PL & FTP_CUST_OPCODE); /*Set Write to PL Opcode*/
 	I2C_Write_USB_PD(Port,FTP_CTRL_1,Buffer,1);
+
 	Buffer[0]=FTP_CUST_PWR |FTP_CUST_RST_N | FTP_CUST_REQ;  /* Load Write to PL Sectors Opcode */  
 	I2C_Write_USB_PD(Port,FTP_CTRL_0,Buffer,1);
 
@@ -169,18 +175,20 @@ void CUST_WriteSector(uint8_t Port,char SectorNum, unsigned char *SectorData)
 	{
 	I2C_Read_USB_PD(Port,FTP_CTRL_0,Buffer,1); /* Wait for execution */
 	}		 
-	while(Buffer[0] & FTP_CUST_REQ) ;
+	while(Buffer[0] & FTP_CUST_REQ) ;  //FTP_CUST_REQ clear by NVM controller
 	
 
 	Buffer[0]= (PROG_SECTOR & FTP_CUST_OPCODE);
 	I2C_Write_USB_PD(Port,FTP_CTRL_1,Buffer,1);/*Set Prog Sectors Opcode*/
+
 	Buffer[0]=(SectorNum & FTP_CUST_SECT) |FTP_CUST_PWR |FTP_CUST_RST_N | FTP_CUST_REQ;
 	I2C_Write_USB_PD(Port,FTP_CTRL_0,Buffer,1); /* Load Prog Sectors Opcode */  
+
 	do 
 	{
 	I2C_Read_USB_PD(Port,FTP_CTRL_0,Buffer,1); /* Wait for execution */
 	}
-	while(Buffer[0] & FTP_CUST_REQ) ;
+	while(Buffer[0] & FTP_CUST_REQ); //FTP_CUST_REQ clear by NVM controller
 
 }
 

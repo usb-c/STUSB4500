@@ -172,6 +172,8 @@ int PostProcess_UsbEvents()
             {
                 printf("Attached [CC2] ");
             }
+            
+            Print_TypeC_MaxCurrentAt5V_FROM_SRC(Usb_Port);
         }
         else
         {

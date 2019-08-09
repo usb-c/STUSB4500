@@ -816,6 +816,105 @@ void Clear_PDO_FROM_SRC(uint8_t Usb_Port)
     Nego_RDO.d32 = 0;
 }
 
+//definitions for CC_STATUS register
+#define STUSB4500_CC_NOT_LOOKING 0
+#define STUSB4500_CC_LOOKING 1
+
+#define STUSB4500_PRESENT_RP 0 //Pull-Up resistor
+#define STUSB4500_PRESENT_RD 1 //Pull-Down resistor
+
+#define STUSB4500_CC_SNK_Open 0
+#define STUSB4500_CC_SNK_Default 1
+#define STUSB4500_CC_SNK_Power15A 2
+#define STUSB4500_CC_SNK_Power30A 3
+
+
+int Print_TypeC_MaxCurrentAt5V_FROM_SRC(uint8_t Usb_Port)  
+{
+    int Status;
+    unsigned char DataRW[2];
+    
+    
+#ifdef PRINTF      
+    printf("\r\n");
+    printf("                         ");
+    printf("--- Type-C Current at 5V (from SRC Pull-up resistor):\r\n");
+#endif
+    
+    // read & update CC Attachement status
+    Status = I2C_Read_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit ,CC_STATUS ,&DataRW[0], 1);
+    PD_status[Usb_Port].CC_status.d8 = DataRW[0];
+    
+    
+    if( (PD_status[Usb_Port].CC_status.b.LOOKING_FOR_CONNECTION == STUSB4500_CC_NOT_LOOKING) && (PD_status[Usb_Port].CC_status.b.CONNECT_RESULT == STUSB4500_PRESENT_RD) )
+    {
+        do
+        {
+            // read & update CC Attachement status
+            Status = I2C_Read_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit ,CC_STATUS ,&DataRW[0], 1);
+            if(Status != 0) return -1; //error
+            PD_status[Usb_Port].CC_status.d8 = DataRW[0];
+        }
+        while( (PD_status[Usb_Port].CC_status.b.LOOKING_FOR_CONNECTION == STUSB4500_CC_NOT_LOOKING) &&
+              (PD_status[Usb_Port].CC_status.b.CC1_STATE == STUSB4500_CC_SNK_Open) &&
+               (PD_status[Usb_Port].CC_status.b.CC2_STATE == STUSB4500_CC_SNK_Open) );
+        
+#ifdef DEBUG
+        printf("                         ");
+        printf("CC1 state: %X\r\n", PD_status[Usb_Port].CC_status.b.CC1_STATE);
+        printf("                         ");
+        printf("CC2 state: %X\r\n", PD_status[Usb_Port].CC_status.b.CC2_STATE);
+#endif
+        
+        int UsedCCpin_state = -1;
+        
+        if( (PD_status[Usb_Port].CC_status.b.CC1_STATE == STUSB4500_CC_SNK_Open) && (PD_status[Usb_Port].CC_status.b.CC2_STATE != STUSB4500_CC_SNK_Open) )
+        {
+            #ifdef DEBUG
+            printf("                         ");
+            printf("CC2 pin attached. \r\n");
+            #endif
+            UsedCCpin_state = PD_status[Usb_Port].CC_status.b.CC2_STATE;
+        }
+        
+        if( (PD_status[Usb_Port].CC_status.b.CC2_STATE == STUSB4500_CC_SNK_Open) && (PD_status[Usb_Port].CC_status.b.CC1_STATE != STUSB4500_CC_SNK_Open) )
+        {
+            #ifdef DEBUG
+            printf("                         ");
+            printf("CC1 pin attached. \r\n");
+            #endif
+            UsedCCpin_state = PD_status[Usb_Port].CC_status.b.CC1_STATE;
+        }
+        
+        if(UsedCCpin_state != -1)
+        {
+            if(UsedCCpin_state == STUSB4500_CC_SNK_Default)
+            {
+                printf("                         ");
+                printf("Legacy Current (100mA, 500mA, or 900mA) \r\n");
+            }
+            
+            else if(UsedCCpin_state == STUSB4500_CC_SNK_Power15A)
+            {
+                printf("                         ");
+                printf("Type-C Current: 1.5A\r\n");
+            }
+            else if(UsedCCpin_state == STUSB4500_CC_SNK_Power30A)
+            {
+                printf("                         ");
+                printf("Type-C Current: 3.0A\r\n");
+            }
+        }
+    }
+    else
+    {
+        printf("USB-C not attached.\r\n");
+    }
+    
+    return 0;
+}
+
+
 int Change_PDO_WithoutLosingVbus(unsigned int New_PDO_Voltage)
 {
     int Usb_Port = 0;

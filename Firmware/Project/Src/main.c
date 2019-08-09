@@ -231,6 +231,7 @@ int main(void)
     
     
     Print_PDO_FROM_SRC(Usb_Port);
+    Print_TypeC_MaxCurrentAt5V_FROM_SRC(Usb_Port);
     
     printf("Changing the Sink PDOs ... \r\n");
     Update_Valid_PDO_Number( Usb_Port, 3 );
