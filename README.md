@@ -25,6 +25,7 @@ To change the role, it is needed to send a USB PD command: PowerRole_Swap or Dat
 
 * __Features:__ Autonomous, configurable, easy to use, small footprint <br />
 * __Operating supply:__ 5V to 20V directly from Vbus of the USB-C cable. <br /> Or a lower power (3.3V) for battery supplied applications <br />
+* __Power Consumption:__ 140 uA only <br />
 * __Package:__ QFN-24, WLCSP MSL1 <br />
 * __Part number:__ STUSB4500QTR, STUSB4500BJR
 * __USB Spec:__ USB Type-C v1.2 , USB PD v2.0 & v3.0
@@ -75,7 +76,7 @@ But the NVM memory is not directly accessible byte per byte. It has to be access
 The NVM size is 40 bytes.  <br/>
 
 The NVM programming is done through I2C. <br/>
-You can program the chip during manufacturing with any standard programming tool, as long as the tool has access to the I2C interface.
+You can program the chip during manufacturing flow with any standard programming tool, as long as the tool has access to the I2C interface.
 
 Link: [Source code for this project](NVM_Flasher)  <br/>
 
@@ -88,7 +89,7 @@ Note that the GUI can be used offline for the parameters selection (i.e. without
 1. Reset the chip so that it reloads its latest NVM configuration
 1. Now the chip is programmed. Each time it starts up, it will load the configuration from the NVM memory.
 
-* Note 1 : In a typical application, the chip's NVM only needs to be programmed once (during manufacturing).
+* Note 1 : In a typical application, the chip's NVM only needs to be programmed once (during manufacturing flow).
 * Note 2 : The NVM technology has a limited number of write cycles possible (few thousands). So do not use an application which re-write the NVM all the time.
 
 
