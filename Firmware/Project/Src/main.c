@@ -209,52 +209,52 @@ int main(void)
         Print_RDO(Usb_Port);
     }
     
-    if(CableAttached == 1) //VBUS_POWERED_APPLICATION
+    if(CableAttached == 1) //reset for VBUS_POWERED_APPLICATION
     {
-    printf("Power Source SW-RESET ...");
-    PdMessage_SoftReset_WithTimeout(); //To make the Source send its PDO Capabilities
+        printf("Power Source SW-RESET ...");
+        //PdMessage_SoftReset_WithTimeout(); //To make the Source send its PDO Capabilities
     }
     else
     {
-    
+        
 #ifdef USE_RESET_PIN
-    printf("Resetting the STUSB4500 (Hard-RESET) \r\n");
-    HW_Reset_state(Usb_Port);
-    
+        printf("Resetting the STUSB4500 (Hard-RESET) \r\n");
+        HW_Reset_state(Usb_Port);
+        
 #else
-    printf("STUSB4500 SW-RESET ");
-    Status = SW_reset_by_Reg(Usb_Port);
-    usb_pd_init(Usb_Port); //refresh main registers & IRQ mask init needed after reset
-    Status = I2C_Read_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit,REG_DEVICE_ID ,&Cut[Usb_Port], 1 );
+        printf("STUSB4500 SW-RESET ");
+        Status = SW_reset_by_Reg(Usb_Port);
+        usb_pd_init(Usb_Port); //refresh main registers & IRQ mask init needed after reset
+        Status = I2C_Read_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit,REG_DEVICE_ID ,&Cut[Usb_Port], 1 );
 #endif
     }
     
     
-    Print_PDO_FROM_SRC(Usb_Port);
-    Print_TypeC_MaxCurrentAt5V_FROM_SRC(Usb_Port);
+    GetSrcCap(Usb_Port); //Get Source Capabilities and Print them
+    
     
     printf("Changing the Sink PDOs ... \r\n");
     Update_Valid_PDO_Number( Usb_Port, 3 );
     Update_PDO(Usb_Port,1,5000,1500);
     Update_PDO(Usb_Port,2,9000,1000);
     Update_PDO(Usb_Port,3,20000,1000);   
-
+    
     if(CableAttached == 1)
     {
-      PdMessage_SoftReset_WithTimeout(); //To force negociation with the new Sink PDO
+        PdMessage_SoftReset_WithTimeout(); //To force negociation with the new Sink PDO
     }
     else
     {
-    
+        
 #ifdef USE_RESET_PIN
-    //printf("Resetting the STUSB4500 (Hard-RESET) \r\n");
-    HW_Reset_state(Usb_Port);
-
+        //printf("Resetting the STUSB4500 (Hard-RESET) \r\n");
+        HW_Reset_state(Usb_Port);
+        
 #else
-    //printf("STUSB4500 SW-RESET ");
-    Status = SW_reset_by_Reg(Usb_Port);
-    usb_pd_init(Usb_Port); //refresh main registers & IRQ mask init needed after reset
-    Status = I2C_Read_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit,REG_DEVICE_ID ,&Cut[Usb_Port], 1 );
+        //printf("STUSB4500 SW-RESET ");
+        Status = SW_reset_by_Reg(Usb_Port);
+        usb_pd_init(Usb_Port); //refresh main registers & IRQ mask init needed after reset
+        Status = I2C_Read_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit,REG_DEVICE_ID ,&Cut[Usb_Port], 1 );
 #endif
     }
     
@@ -288,7 +288,7 @@ int main(void)
         
 #ifdef DEMO_PDO_ROLLING  // Define to enable the STUSB4500_PDO_rolling_DEMO
         if( Timer_Action_Flag[Usb_Port] == 1  )
-        Timer_Action();
+            Timer_Action();
 #endif
         
     }
@@ -394,7 +394,7 @@ void push_button_DebugIrq(void)
 #endif
     
     //--------------------------------------
-#if 0
+#if 1
     //Debug
     int Status;
     int Address;
@@ -493,7 +493,7 @@ void push_button_DebugIrq(void)
 #endif
     
     //--------------------------------------
-    Print_PDO_Voltage();
+    Print_requested_PDO_Voltage();
     //--------------------------------------
     
     push_button_Action_Flag[Usb_Port] = 0 ;
@@ -580,7 +580,7 @@ void push_button_Action2(void)
     {
         printf("ERROR %d\r\n", status);
     }
-
+    
     Print_SNK_PDO(Usb_Port);
     
     
@@ -589,12 +589,10 @@ void push_button_Action2(void)
 
 void Timer_Action(void)
 {
-    //STUSB_GEN1S_ALERT_STATUS_RegTypeDef Alert_Mask;
     int Usb_Port = 0;
     //int i =0;
     int Status;
     
-    //    if (PD_status[Usb_Port].Port_status != 0)
     if(PB_press == 0 )
     {
 #ifdef PRINTF    

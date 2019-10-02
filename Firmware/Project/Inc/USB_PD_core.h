@@ -210,7 +210,7 @@ typedef struct
 
 void HW_Reset_state(uint8_t Usb_Port);
 int SW_reset_by_Reg(uint8_t Usb_Port);
-void usb_pd_init(uint8_t Usb_Port);
+int usb_pd_init(uint8_t Usb_Port);
 void ALARM_MANAGEMENT(uint8_t Usb_Port);
 void Read_SNK_PDO(uint8_t Usb_Port);
 void Print_SNK_PDO(uint8_t Usb_Port);
@@ -230,13 +230,13 @@ void Negotiate_5V(uint8_t Usb_Port);
 int CheckCableAttachementStatus(void);
 void Clear_PDO_FROM_SRC(uint8_t Usb_Port);
 int Print_TypeC_MaxCurrentAt5V_FROM_SRC(uint8_t Usb_Port);
-void Print_PDO_Voltage(void);
+void Print_requested_PDO_Voltage(void);
 
 int Change_PDO_WithoutLosingVbus(unsigned int New_PDO_Voltage);
 int Change_PDO_WithoutLosingVbus_WithTimeout(unsigned int New_PDO_Voltage);
 int PdMessage_SoftReset();
 int PdMessage_SoftReset_WithTimeout();
-
+int GetSrcCap(uint8_t Usb_Port); //GetSourceCapabilities
 
 #ifdef __cplusplus
 }

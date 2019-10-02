@@ -98,12 +98,12 @@ this function clears all interrupts and unmask the usefull interrupt
 
 ************************************************************************************/
 
-void usb_pd_init(uint8_t Usb_Port)
+int usb_pd_init(uint8_t Usb_Port)
 {
     STUSB_GEN1S_ALERT_STATUS_MASK_RegTypeDef Alert_Mask;
     int Status;
-    static int i,j;
-    static unsigned char DataRW[40];	
+    int i,j;
+    unsigned char DataRW[40];	
     DataRW[0]= 0;
     
     uint8_t Cut;
@@ -123,6 +123,7 @@ void usb_pd_init(uint8_t Usb_Port)
     for (i=0;i<=12;i++) /* clear ALERT Status */
     {
         Status = I2C_Read_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit ,Address+i ,&DataRW[0], 1 );  // clear ALERT Status
+        if(Status != 0) return -1;
     }
     
     
@@ -134,8 +135,11 @@ void usb_pd_init(uint8_t Usb_Port)
     Alert_Mask.b.PRT_STATUS_AL_MASK = 0;
     DataRW[0]= Alert_Mask.d8;// interrupt unmask 
     Status = I2C_Write_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit ,ALERT_STATUS_MASK ,&DataRW[0], 1 ); // unmask port status alarm 
+    if(Status != 0) return -1;
     
     Status = I2C_Read_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit ,PORT_STATUS ,&DataRW[0], 10 ); 
+    if(Status != 0) return -1;
+    
     USB_PD_Interupt_Flag[Usb_Port] =0;
     PD_status[Usb_Port].Port_Status.d8 = DataRW[ 1 ] ;
     PD_status[Usb_Port].CC_status.d8 = DataRW[3];
@@ -143,7 +147,7 @@ void usb_pd_init(uint8_t Usb_Port)
     PD_status[Usb_Port].Monitoring_status.d8=DataRW[3];
     
     
-    return;
+    return 0;
 }
 
 /**********************   ALARM_MANAGEMENT(uint8_t Port)  ***************************
@@ -158,9 +162,6 @@ void ALARM_MANAGEMENT(uint8_t Usb_Port)
     STUSB_GEN1S_ALERT_STATUS_MASK_RegTypeDef Alert_Mask;
     unsigned char DataRW[40];
     
-    
-    //if ( HAL_GPIO_ReadPin(ALERT_A_GPIO_Port,ALERT_A_Pin)== GPIO_PIN_RESET)
-    //{
     
     Address = ALERT_STATUS_1; 
     Status = I2C_Read_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit ,Address ,&DataRW[0], 2 );
@@ -405,7 +406,7 @@ This function print the STUSB4500 PDO to the serial interface.
 
 void Print_SNK_PDO(uint8_t Usb_Port)  
 {
-    static uint8_t i;
+    uint8_t i;
     static int MAX_POWER = 0;
     MAX_POWER = 0;
     
@@ -423,9 +424,9 @@ void Print_SNK_PDO(uint8_t Usb_Port)
         {
         case 0:  /* fixed supply */
             {
-                static float PDO_V;
-                static float PDO_I;
-                static int   PDO_P;          
+                float PDO_V;
+                float PDO_I;
+                int   PDO_P;          
                 PDO_V = (float) (PDO_SNK[Usb_Port][i].fix.Voltage)/20;
                 PDO_I = (float) (PDO_SNK[Usb_Port][i].fix.Operationnal_Current)/100;
                 PDO_P = (int) (PDO_V*PDO_I); 
@@ -438,9 +439,9 @@ void Print_SNK_PDO(uint8_t Usb_Port)
             break;
         case 1: /* Variable Supply */
             {
-                static float PDO_V_Min;
-                static float PDO_V_Max;
-                static float PDO_I;
+                float PDO_V_Min;
+                float PDO_V_Max;
+                float PDO_I;
                 PDO_V_Max = (float) (PDO_SNK[Usb_Port][i].var.Max_Voltage)/20;
                 PDO_V_Min = (float) (PDO_SNK[Usb_Port][i].var.Min_Voltage)/20;
                 PDO_I = (float) (PDO_SNK[Usb_Port][i].var.Operating_Current)/100;
@@ -462,7 +463,7 @@ void Print_SNK_PDO(uint8_t Usb_Port)
                 printf(" -Battery PDO%u=(%4.2fV, %4.2fV, = %4.2fW)\r\n",i+1, PDO_V_Min, PDO_V_Max, PDO_P );
 #endif 
                 if (PDO_P >=MAX_POWER)
-                { MAX_POWER = PDO_P;}
+                { MAX_POWER = (int) PDO_P;}
             }
             break;            
         default :
@@ -535,7 +536,7 @@ capability MATCH between the STUSB4500 and the SOURCE.
 ************************************************************************************/
 #define USE_FLOAT
 
-void Print_RDO(uint8_t Usb_Port)
+void Print_RDO(uint8_t Usb_Port) //RDO=Request Data Object
 {
     uint8_t Buffer = 0;
     
@@ -584,7 +585,7 @@ void Print_RDO(uint8_t Usb_Port)
 #endif
 }
 
-void Print_PDO_Voltage(void)
+void Print_requested_PDO_Voltage(void)
 {
     int Usb_Port=0;
     uint8_t Buffer = 0;
@@ -768,11 +769,12 @@ SOURCE capabilities are automatically stored at device connection in a dedicated
 
 void Print_PDO_FROM_SRC(uint8_t Usb_Port)  
 {
-    static uint8_t i;
-    static float PDO_V;
-    static float PDO_I;
-    static int   PDO_P;
-    static int MAX_POWER = 0;
+    uint8_t i;
+    float PDO_V;
+    float PDO_I;
+    int   PDO_P;
+    int MAX_POWER;
+    
     MAX_POWER = 0;
     
 #ifdef PRINTF
@@ -857,7 +859,7 @@ int Print_TypeC_MaxCurrentAt5V_FROM_SRC(uint8_t Usb_Port)
         }
         while( (PD_status[Usb_Port].CC_status.b.LOOKING_FOR_CONNECTION == STUSB4500_CC_NOT_LOOKING) &&
               (PD_status[Usb_Port].CC_status.b.CC1_STATE == STUSB4500_CC_SNK_Open) &&
-               (PD_status[Usb_Port].CC_status.b.CC2_STATE == STUSB4500_CC_SNK_Open) );
+                  (PD_status[Usb_Port].CC_status.b.CC2_STATE == STUSB4500_CC_SNK_Open) );
         
 #ifdef DEBUG
         printf("                         ");
@@ -870,19 +872,19 @@ int Print_TypeC_MaxCurrentAt5V_FROM_SRC(uint8_t Usb_Port)
         
         if( (PD_status[Usb_Port].CC_status.b.CC1_STATE == STUSB4500_CC_SNK_Open) && (PD_status[Usb_Port].CC_status.b.CC2_STATE != STUSB4500_CC_SNK_Open) )
         {
-            #ifdef DEBUG
+#ifdef DEBUG
             printf("                         ");
             printf("CC2 pin attached. \r\n");
-            #endif
+#endif
             UsedCCpin_state = PD_status[Usb_Port].CC_status.b.CC2_STATE;
         }
         
         if( (PD_status[Usb_Port].CC_status.b.CC2_STATE == STUSB4500_CC_SNK_Open) && (PD_status[Usb_Port].CC_status.b.CC1_STATE != STUSB4500_CC_SNK_Open) )
         {
-            #ifdef DEBUG
+#ifdef DEBUG
             printf("                         ");
             printf("CC1 pin attached. \r\n");
-            #endif
+#endif
             UsedCCpin_state = PD_status[Usb_Port].CC_status.b.CC1_STATE;
         }
         
@@ -950,7 +952,7 @@ int Change_PDO_WithoutLosingVbus_WithTimeout(unsigned int New_PDO_Voltage)
     Update_PDO(Usb_Port, 2, New_PDO_Voltage, 1000); 
     status = PdMessage_SoftReset_WithTimeout(); //force the new PDO negociation, by resetting the Source (Vbus is not lost during the reset)
     
-    if(status != 0) return status;
+    if(status != 0) return status; //error
     
     return 0; //OK
 }
@@ -1078,3 +1080,26 @@ int PdMessage_SoftReset_WithTimeout()
     }
 }
 
+int GetSrcCap(uint8_t Usb_Port) //GetSourceCapabilities by sending a request or sw-reset to the USB-PD Source
+{
+    int status;
+    
+    Clear_PDO_FROM_SRC(Usb_Port); //clear ISR variables for sanity check
+    
+    status = PdMessage_SoftReset_WithTimeout(); //make the Source send its PDO Capabilities
+    
+    if(status != 0)
+    {     
+        printf("GetSrcCap Error\r\n");
+        return status; //error
+    }
+    else
+    {
+        //Note: the PDO_FROM_SRC variable is updated during ISR
+        
+        Print_TypeC_MaxCurrentAt5V_FROM_SRC(Usb_Port);
+        Print_PDO_FROM_SRC(Usb_Port);
+    }
+    
+    return 0; //OK
+}
