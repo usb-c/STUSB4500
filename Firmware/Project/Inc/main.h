@@ -69,8 +69,8 @@
 
 /* USER CODE BEGIN Private defines */
 
-void push_button_Action(void);
-void push_button_Action2(void);
+void push_button_Action_PdoChangeDemo(void);
+void push_button_Action_SelectNextPdo(void);
 void Timer_Action(void);
 
 /* USER CODE END Private defines */

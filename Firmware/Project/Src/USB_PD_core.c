@@ -536,7 +536,7 @@ capability MATCH between the STUSB4500 and the SOURCE.
 ************************************************************************************/
 #define USE_FLOAT
 
-void Print_RDO(uint8_t Usb_Port) //RDO=Request Data Object
+void Print_RDO(uint8_t Usb_Port) // RDO = Request Data Object
 {
     uint8_t Buffer = 0;
     
@@ -916,6 +916,40 @@ int Print_TypeC_MaxCurrentAt5V_FROM_SRC(uint8_t Usb_Port)
     return 0;
 }
 
+//-----------------------------------
+//Check USB-C cable attachment status
+//return -1 if not connected
+//return 1 if connected on CC1
+//return 2 if connected on CC2
+//-----------------------------------
+int CheckCableAttached()  
+{
+    int status;
+    uint8_t UsbPort = 0;
+    uint8_t Data;
+    
+    // read CC pin Attachment status
+    status = I2C_Read_USB_PD(STUSB45DeviceConf[UsbPort].I2cBus,STUSB45DeviceConf[UsbPort].I2cDeviceID_7bit, PORT_STATUS, &Data, 1);  if(status != 0) { return -2; }
+    
+    if( (Data & STUSBMASK_ATTACHED_STATUS) == VALUE_ATTACHED) //only if USB-C cable attached
+    {
+        Address = TYPE_C_STATUS; //[Read only]
+        status = I2C_Read_USB_PD(STUSB45DeviceConf[UsbPort].I2cBus, STUSB45DeviceConf[UsbPort].I2cDeviceID_7bit, Address , &Data, 1 ); if(status != 0) return -2; //I2C Error
+        
+        if(( Data & MASK_REVERSE) == 0)
+        {
+            return 1;  //OK, cable attached on CC1 pin
+        }
+        else
+        {
+            return 2;  //OK, cable attached on CC2 pin
+        }
+    }
+    else
+    {
+        return -1; //Error, USB-C cable not attached
+    }
+}
 
 int Change_PDO_WithoutLosingVbus(unsigned int New_PDO_Voltage)
 {
@@ -972,8 +1006,7 @@ int PdMessage_SoftReset()
     //-------------------------------------
     
     // read CC pin Attachement status
-    status = I2C_Read_USB_PD(STUSB45DeviceConf[UsbPort].I2cBus,STUSB45DeviceConf[UsbPort].I2cDeviceID_7bit ,PORT_STATUS ,&Data, 1);
-    if(status != 0) { return -1; }
+    status = I2C_Read_USB_PD(STUSB45DeviceConf[UsbPort].I2cBus,STUSB45DeviceConf[UsbPort].I2cDeviceID_7bit ,PORT_STATUS ,&Data, 1);  if(status != 0) { return -1; }
     
     if( (Data & STUSBMASK_ATTACHED_STATUS) == VALUE_ATTACHED) //only if cable attached
     {

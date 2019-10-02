@@ -77,7 +77,7 @@ void SystemClock_Config(void);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
-void push_button_Action(void);
+void push_button_Action_PdoChangeDemo(void);
 extern void nvm_flash(uint8_t Usb_Port);
 STUSB_GEN1S_RDO_REG_STATUS_RegTypeDef Nego_RDO;
 int PB_press=0;
@@ -166,50 +166,36 @@ int main(void)
     }
 #endif
     
-    int CableAttached = 0;
+    int CableAttachedStatus = 0;
     
     {
-        int Status;
-        unsigned char DataR = 0;
-        
-        // read CC Attachement status
-        Status = I2C_Read_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit ,PORT_STATUS ,&DataR, 1);
-        
         printf("\r\n=== CABLE: ");
         
-        if( (DataR & STUSBMASK_ATTACHED_STATUS) == VALUE_ATTACHED)
+        if(CableAttachedStatus = CheckCableAttached() >= 1) //USB-C cable attached
         {
-            CableAttached = 1;
-            
-            uint8_t Data;
-            Address = TYPE_C_STATUS; //[Read only]
-            Status = I2C_Read_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus, STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit, Address , &Data, 1 );
-            if(Status != 0) return -1; //I2C Error
-            
-            if(( Data & MASK_REVERSE) == 0)
+            if( CableAttachedStatus == 1)
             {
                 printf("Attached [CC1] ");
             }
-            else
+            else if( CableAttachedStatus == 2)
             {
                 printf("Attached [CC2] ");
             }
         }
         else
         {
-            CableAttached = 0;
             printf("Not-attached ");
         }
         
         printf("\r\n");
     }
     
-    if(CableAttached == 1)
+    if(CableAttachedStatus >= 1)
     {
         Print_RDO(Usb_Port);
     }
     
-    if(CableAttached == 1) //reset for VBUS_POWERED_APPLICATION
+    if(CableAttachedStatus >= 1) //reset for VBUS_POWERED_APPLICATION
     {
         printf("Power Source SW-RESET ...");
         //PdMessage_SoftReset_WithTimeout(); //To make the Source send its PDO Capabilities
@@ -239,7 +225,7 @@ int main(void)
     Update_PDO(Usb_Port,2,9000,1000);
     Update_PDO(Usb_Port,3,20000,1000);   
     
-    if(CableAttached == 1)
+    if(CableAttachedStatus >= 1)
     {
         PdMessage_SoftReset_WithTimeout(); //To force negociation with the new Sink PDO
     }
@@ -270,18 +256,15 @@ int main(void)
     /* USER CODE BEGIN WHILE */
     while (1)
     {
-        /* USER CODE END WHILE */
-        
-        /* USER CODE BEGIN 3 */
         
         PostProcess_UsbEvents();
         
         if( push_button_Action_Flag[Usb_Port] == 1  )
         {
-#if 0
-            push_button_Action(); 
+#if 1
+            push_button_Action_SelectNextPdo(); //PDO_clicker: select the next PDO available.
 #else
-            push_button_Action2(); //PDO clicker
+            push_button_Action_PdoChangeDemo(); 
 #endif
         }
         
@@ -406,6 +389,7 @@ void push_button_DebugIrq(void)
     // clear all ALERT Status
     Address = ALERT_STATUS_1;
     Status = I2C_Read_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit ,Address ,&DataRW[0], 13 );  // clear ALERT Status
+    if(Status != 0) return; //Error
     
     for(int i=0; i<13; i++)
     {
@@ -501,7 +485,7 @@ void push_button_DebugIrq(void)
 
 
 
-void push_button_Action(void)
+void push_button_Action_PdoChangeDemo(void)
 {
     uint8_t Usb_Port = 0;
 #ifdef PRINTF
@@ -564,7 +548,7 @@ void push_button_Action(void)
     push_button_Action_Flag[Usb_Port] = 0 ;
 }
 
-void push_button_Action2(void)
+void push_button_Action_SelectNextPdo(void)
 {
     uint8_t Usb_Port = 0;
     int status;
@@ -676,6 +660,7 @@ void Timer_Action(void)
         flag_once = 1;
         SW_reset_by_Reg(Usb_Port);
         Status = I2C_Read_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit ,PORT_STATUS ,&PD_status[Usb_Port].Port_Status.d8, 1 );
+        if(Status != 0) return; //Error
         
         if ( Time_elapse == 1)
             Flag_count = 1 ;

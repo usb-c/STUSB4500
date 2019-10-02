@@ -21,6 +21,11 @@ int Select_Next_PDO_SRC(uint8_t UsbPort, int * out_NewPDO_mV)
     int status = -1;
     volatile int Timeout = 0; //to be implemented
     
+    if(CheckCableAttached() < 0)
+    {
+        return -9; //error, cable not attached
+    }
+    
     if(PDO_FROM_SRC_Num[UsbPort] >= 1 )
     {
         status = Get_current_Sink_PDO_Numb(UsbPort, &PDO_SNK_selected); //current PDO on Sink side
