@@ -514,6 +514,9 @@ typedef union
 
 /*Identification of STUSB */
 #define REG_DEVICE_ID 0x2F
+  #define STUSB4500_ID 0x25
+  #define STUSB4500_ID_B 0x21
+
 #define EXTENTION_10  (uint8_t )0x80
 #define ID_Reg (uint8_t )0x1C 
 #define CUT (uint8_t )3<<2

@@ -155,7 +155,7 @@ int main(void)
     
     
 #ifdef PRINTF
-    if (Cut[Usb_Port] == 0x21 )
+    if( (Cut[Usb_Port] == STUSB4500_ID ) || (Cut[Usb_Port] == STUSB4500_ID_B ))
     {
         printf("STUSB4500 detected. (0x%02x)\r\n", Cut[0]);
     }
