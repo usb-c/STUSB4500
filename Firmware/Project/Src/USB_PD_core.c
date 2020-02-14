@@ -25,7 +25,7 @@ uint8_t PDO_SRC_NUMB[USBPORT_MAX];
 uint8_t PDO_SNK_NUMB[USBPORT_MAX];
 
 
-extern volatile uint8_t  USB_PD_Interupt_Flag[USBPORT_MAX] ;
+extern volatile uint8_t  USB_PD_Interrupt_Flag[USBPORT_MAX] ;
 //extern uint8_t USB_PD_Status_change_flag[USBPORT_MAX] ;
 
 extern USB_PD_I2C_PORT STUSB45DeviceConf[USBPORT_MAX];
@@ -140,7 +140,7 @@ int usb_pd_init(uint8_t Usb_Port)
     Status = I2C_Read_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit ,PORT_STATUS ,&DataRW[0], 10 ); 
     if(Status != 0) return -1;
     
-    USB_PD_Interupt_Flag[Usb_Port] =0;
+    USB_PD_Interrupt_Flag[Usb_Port] =0;
     PD_status[Usb_Port].Port_Status.d8 = DataRW[ 1 ] ;
     PD_status[Usb_Port].CC_status.d8 = DataRW[3];
     PD_status[Usb_Port].HWFault_status.d8 = DataRW[6];
@@ -157,11 +157,12 @@ device interrupt Handler
 
 void ALARM_MANAGEMENT(uint8_t Usb_Port)   
 {
-    int i,Status;
+    int Status = 0;
     STUSB_GEN1S_ALERT_STATUS_RegTypeDef Alert_Status;
     STUSB_GEN1S_ALERT_STATUS_MASK_RegTypeDef Alert_Mask;
     unsigned char DataRW[40];
     
+    UNUSED(Status);
     
     Address = ALERT_STATUS_1; 
     Status = I2C_Read_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit ,Address ,&DataRW[0], 2 );
@@ -219,7 +220,8 @@ void ALARM_MANAGEMENT(uint8_t Usb_Port)
         if (Alert_Status.b.PRT_STATUS_AL !=0)
         {
             USBPD_MsgHeader_TypeDef Header;
-            STUSB_GEN1S_PRT_STATUS_RegTypeDef Prt_Status;
+            //STUSB_GEN1S_PRT_STATUS_RegTypeDef Prt_Status;
+            
             Status = I2C_Read_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit ,PRT_STATUS ,&PD_status[Usb_Port].PRT_status.d8, 1 );
             
             if (PD_status[Usb_Port].PRT_status.b.MSG_RECEIVED == 1)
@@ -355,7 +357,7 @@ void ALARM_MANAGEMENT(uint8_t Usb_Port)
     }
     //}
     
-    USB_PD_Interupt_Flag[Usb_Port] = 0;
+    USB_PD_Interrupt_Flag[Usb_Port] = 0;
 }
 
 
@@ -393,7 +395,7 @@ void Read_SNK_PDO(uint8_t Usb_Port)
         }
     }
     
-    //USB_PD_Interupt_Flag[Usb_Port] =0;
+    //USB_PD_Interrupt_Flag[Usb_Port] =0;
     return;
 }
 
@@ -489,7 +491,6 @@ void Read_RDO(uint8_t Usb_Port)
 int Get_RDO(uint8_t UsbPort, int * out_PDO_nb , int * out_Voltage_mV, int * out_Current_mA, int * out_MaxCurrent_mA)
 {
     int status;
-    uint8_t Buffer;
     
     status = I2C_Read_USB_PD(STUSB45DeviceConf[UsbPort].I2cBus,STUSB45DeviceConf[UsbPort].I2cDeviceID_7bit ,RDO_REG_STATUS ,(uint8_t *)&Nego_RDO.d32, 4 );
     if(status != 0) { return -1; }
@@ -510,6 +511,7 @@ int Get_RDO(uint8_t UsbPort, int * out_PDO_nb , int * out_Voltage_mV, int * out_
     }
     
 #if 0 //to test
+    uint8_t Buffer;
     status = I2C_Read_USB_PD(STUSB45DeviceConf[UsbPort].I2cBus,STUSB45DeviceConf[UsbPort].I2cDeviceID_7bit , STUSB_GEN1S_MONITORING_CTRL_1 ,&Buffer, 1 );
     if(status != 0) { return -1; }
     int Voltage_mV = Buffer * 100;
@@ -736,7 +738,9 @@ int Find_Matching_SRC_PDO(uint8_t Usb_Port,int Min_Power,int Min_V , int Max_V)
     int   PDO_P;
     int PDO1_updated = 0 ;
     
-    int Status;
+    int Status = 0;
+    UNUSED(Status);
+    
     if(PDO_FROM_SRC_Num[Usb_Port] > 1 )
     {
         for (i=1; i< PDO_FROM_SRC_Num[Usb_Port]; i++)   // loop started from PDO2 
@@ -746,7 +750,7 @@ int Find_Matching_SRC_PDO(uint8_t Usb_Port,int Min_Power,int Min_V , int Max_V)
             PDO_P = (int)(( PDO_V/1000) * (PDO_I/1000)); 
             if ((PDO_P >=Min_Power ) && (PDO_V > Min_V ) && (PDO_V <= Max_V ))
             {
-                Update_PDO( Usb_Port, 3 ,PDO_V , PDO_I );
+                Status = Update_PDO( Usb_Port, 3 ,PDO_V , PDO_I );
                 PDO1_updated = 1 ;
             }              
         }

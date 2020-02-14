@@ -92,7 +92,7 @@ void CableDetection(void);
 STUSB_GEN1S_RDO_REG_STATUS_RegTypeDef Nego_RDO;
 int PB_press=0;
 int Time_elapse=1;
-volatile uint8_t USB_PD_Interupt_Flag[USBPORT_MAX] ;
+volatile uint8_t USB_PD_Interrupt_Flag[USBPORT_MAX] ;
 volatile uint8_t push_button_Action_Flag[USBPORT_MAX];
 volatile uint8_t Timer_Action_Flag[USBPORT_MAX];
 extern USB_PD_StatusTypeDef PD_status[USBPORT_MAX];
@@ -469,7 +469,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     
   case ( ALERT_A_Pin)://B1_Pin 
     { 
-      USB_PD_Interupt_Flag[Usb_Port] = 1;
+      USB_PD_Interrupt_Flag[Usb_Port] = 1;
     } break;
     
     // SELECT HERE WHICH function must be attached to the BLUE push button
@@ -481,7 +481,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
   }
   
 #if USBC_INTERRUPT_MODE
-  if(USB_PD_Interupt_Flag[Usb_Port] != 0)
+  if(USB_PD_Interrupt_Flag[Usb_Port] != 0)
   {
     ALARM_MANAGEMENT(Usb_Port);
   }
