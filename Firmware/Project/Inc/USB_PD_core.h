@@ -87,6 +87,7 @@ typedef uint8_t bool;
 typedef struct  
   {
     uint8_t                                         HW_Reset ; 
+    STUSB_GEN1S_CC_DETECTION_STATUS_TRANS_RegTypeDef Port_Status_Trans;
     STUSB_GEN1S_CC_DETECTION_STATUS_RegTypeDef      Port_Status;/*!< Specifies the Port status register */
     uint8_t TypeC;
     STUSB_GEN1S_CC_STATUS_RegTypeDef                CC_status;

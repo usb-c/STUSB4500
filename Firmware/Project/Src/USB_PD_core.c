@@ -187,7 +187,7 @@ void ALARM_MANAGEMENT(uint8_t Usb_Port)
         {
             //[Read/Clear]
             Status = I2C_Read_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit ,PORT_STATUS_TRANS ,&DataRW[0], 2 );
-            //PD_status[Usb_Port].Port_Status_Trans.d8 = DataRW[ 0 ]; 
+            PD_status[Usb_Port].Port_Status_Trans.d8 = DataRW[ 0 ]; 
             PD_status[Usb_Port].Port_Status.d8= DataRW[ 1 ]; 
             
             if( (DataRW[0] & STUSBMASK_ATTACH_STATUS_TRANS) != 0)
@@ -284,7 +284,7 @@ void ALARM_MANAGEMENT(uint8_t Usb_Port)
                 }
                 else  //Number_of_Data_Objects field == 0 --> Message is a Control-Message
                 {
-                    __NOP();
+                    __NOP(); //for breakpoint
                     
 #ifdef DEBUG_IRQ
                     Push_PD_MessageReceived('C', Header.b.MessageType); //CtrlMsg
