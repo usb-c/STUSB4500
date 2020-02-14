@@ -893,7 +893,7 @@ int Print_TypeC_MaxCurrentAt5V_FROM_SRC(uint8_t Usb_Port)
             if(UsedCCpin_state == STUSB4500_CC_SNK_Default)
             {
                 printf("                         ");
-                printf("Legacy Current (100mA, 500mA, or 900mA) \r\n");
+                printf("Rp=Legacy Current (100mA, 500mA or 900mA) \r\n");
             }
             
             else if(UsedCCpin_state == STUSB4500_CC_SNK_Power15A)
@@ -935,6 +935,10 @@ int CheckCableAttached()
     {
         Address = TYPE_C_STATUS; //[Read only]
         status = I2C_Read_USB_PD(STUSB45DeviceConf[UsbPort].I2cBus, STUSB45DeviceConf[UsbPort].I2cDeviceID_7bit, Address , &Data, 1 ); if(status != 0) return -2; //I2C Error
+        if(status != 0)
+        {
+          return -2; //I2C error
+        }
         
         if(( Data & MASK_REVERSE) == 0)
         {

@@ -424,6 +424,25 @@ typedef enum
 } SW_RESET_TypeDef;
  
 
+#define STUSB_PE_FSM_STATE 0x29 //Policy engine layer FSM state
+  #define PE_INIT 0x00
+  #define PE_SOFT_RESET 0x01
+  #define PE_HARD_RESET 0x02
+  #define PE_SEND_SOFT_RESET 0x03
+  #define PE_C_BIST 0x04
+  #define PE_DISABLED 0x0D
+  #define PE_SNK_STARTUP 0x12
+  #define PE_SNK_DISCOVERY 0x13
+  #define PE_SNK_WAIT_FOR_CAPABILITIES 0x14
+  #define PE_SNK_EVALUATE_CAPABILITIES 0x15
+  #define PE_SNK_SELECT_CAPABILITIES 0x16
+  #define PE_SNK_TRANSITION_SINK 0x17
+  #define PE_SNK_READY 0x18
+  #define PE_SNK_READY_SENDING 0x19
+  #define PE_HARD_RESET_SHUTDOWN 0x3A
+  #define PE_HARD_RESET_RECOVERY 0x3B
+  #define PE_ERRORRECOVERY 0x40
+
 
 #define RX_BYTE_CNT           0x30
 #define RX_HEADER             0x31 //RX message header (16bit)
