@@ -57,12 +57,12 @@ o FTP_CUST_PWR (0x9E b(7), ftp_cust_pwr_i in RTL); power for FTP
 o FTP_CUST_RST_N (0x9E b(6), ftp_cust_reset_n_i in RTL); reset for FTP
 o FTP_CUST_REQ (0x9E b(4), ftp_cust_req_i in RTL); request bit for FTP operation
 o FTP_CUST_SECT (0x9F (2:0), ftp_cust_sect1_i in RTL); for customer to select between sector 0 to 4 for read/write operations (functions as lowest address bit to FTP, remainders are zeroed out)
-o FTP_CUST_SER[4:0] (0x9F b(7:4), ftp_cust_ser_i in RTL); customer Sector Erase Register; controls erase of sector 0 (00001), sector 1 (00010), sector 2 (00100), sector 3 (01000), sector 4 (10000) ) or all (11111).
-o FTP_CUST_OPCODE[2:0] (0x9F b(2:0), ftp_cust_op3_i in RTL). Selects opcode sent to
+o FTP_CUST_SER_MASK[4:0] (0x9F b(7:4), ftp_cust_ser_i in RTL); customer Sector Erase Register; controls erase of sector 0 (00001), sector 1 (00010), sector 2 (00100), sector 3 (01000), sector 4 (10000) ) or all (11111).
+o FTP_CUST_OPCODE_MASK[2:0] (0x9F b(2:0), ftp_cust_op3_i in RTL). Selects opcode sent to
 FTP. Customer Opcodes are:
 o 000 = Read sector
 o 001 = Write Program Load register (PL) with data to be written to sector 0 or 1
-o 010 = Write Sector Erase Register (SER) with data reflected by state of FTP_CUST_SER[4:0]
+o 010 = Write Sector Erase Register (SER) with data reflected by state of FTP_CUST_SER_MASK[4:0]
 o 011 = Read Program Load register (PL)
 o 100 = Read SER;
 o 101 = Erase sector 0 to 4  (depending upon the mask value which has been programmed to SER)
@@ -92,7 +92,7 @@ int CUST_EnterWriteMode(uint8_t Port,unsigned char ErasedSector)
     }
     
     
-    Buffer[0]=((ErasedSector << 3) & FTP_CUST_SER) | ( WRITE_SER & FTP_CUST_OPCODE) ;  /* Load 0xF1 to erase all sectors of FTP and Write SER Opcode */
+    Buffer[0]=((ErasedSector << 3) & FTP_CUST_SER_MASK) | ( WRITE_SER & FTP_CUST_OPCODE_MASK) ;  /* Load 0xF1 to erase all sectors of FTP and Write SER Opcode */
     if ( I2C_Write_USB_PD(Port,FTP_CTRL_1,Buffer,1) != HAL_OK )return -1; /* Set Write SER Opcode */
     
     Buffer[0]=FTP_CUST_PWR | FTP_CUST_RST_N | FTP_CUST_REQ ; 
@@ -104,7 +104,7 @@ int CUST_EnterWriteMode(uint8_t Port,unsigned char ErasedSector)
     }
     while(Buffer[0] & FTP_CUST_REQ); 
     
-    Buffer[0]=  SOFT_PROG_SECTOR & FTP_CUST_OPCODE ;  
+    Buffer[0]=  SOFT_PROG_SECTOR & FTP_CUST_OPCODE_MASK ;  
     if ( I2C_Write_USB_PD(Port,FTP_CTRL_1,Buffer,1) != HAL_OK )return -1;  /* Set Soft Prog Opcode */
     
     Buffer[0]=FTP_CUST_PWR | FTP_CUST_RST_N | FTP_CUST_REQ ; 
@@ -116,7 +116,7 @@ int CUST_EnterWriteMode(uint8_t Port,unsigned char ErasedSector)
     }
     while(Buffer[0] & FTP_CUST_REQ);
     
-    Buffer[0]= ERASE_SECTOR & FTP_CUST_OPCODE ;  
+    Buffer[0]= ERASE_SECTOR & FTP_CUST_OPCODE_MASK ;  
     if ( I2C_Write_USB_PD(Port,FTP_CTRL_1,Buffer,1) != HAL_OK )return -1; /* Set Erase Sectors Opcode */
     
     Buffer[0]=FTP_CUST_PWR | FTP_CUST_RST_N | FTP_CUST_REQ ;  
@@ -160,7 +160,7 @@ int CUST_ReadSector(uint8_t Port,char SectorNum, unsigned char *SectorData)
     Buffer[0]= FTP_CUST_PWR | FTP_CUST_RST_N ;  /* Set PWR and RST_N bits */
     if ( I2C_Write_USB_PD(Port,FTP_CTRL_0,Buffer,1) != HAL_OK )return -1;
     
-    Buffer[0]= (READ & FTP_CUST_OPCODE);
+    Buffer[0]= (READ & FTP_CUST_OPCODE_MASK);
     if ( I2C_Write_USB_PD(Port,FTP_CTRL_1,Buffer,1) != HAL_OK )return -1;/* Set Read Sectors Opcode */
     
     Buffer[0]= (SectorNum & FTP_CUST_SECT) |FTP_CUST_PWR |FTP_CUST_RST_N | FTP_CUST_REQ;
@@ -191,7 +191,7 @@ int CUST_WriteSector(uint8_t Port,char SectorNum, unsigned char *SectorData)
     if ( I2C_Write_USB_PD(Port,FTP_CTRL_0,Buffer,1) != HAL_OK )return -1;
     
     //NVM Program Load Register to write with the 64-bit data to be written in sector
-    Buffer[0]= (WRITE_PL & FTP_CUST_OPCODE); /*Set Write to PL Opcode*/
+    Buffer[0]= (WRITE_PL & FTP_CUST_OPCODE_MASK); /*Set Write to PL Opcode*/
     if ( I2C_Write_USB_PD(Port,FTP_CTRL_1,Buffer,1) != HAL_OK )return -1;
     
     Buffer[0]=FTP_CUST_PWR |FTP_CUST_RST_N | FTP_CUST_REQ;  /* Load Write to PL Sectors Opcode */  
@@ -205,7 +205,7 @@ int CUST_WriteSector(uint8_t Port,char SectorNum, unsigned char *SectorData)
     
     
     //NVM "Word Program" operation to write the Program Load Register in the sector to be written
-    Buffer[0]= (PROG_SECTOR & FTP_CUST_OPCODE);
+    Buffer[0]= (PROG_SECTOR & FTP_CUST_OPCODE_MASK);
     if ( I2C_Write_USB_PD(Port,FTP_CTRL_1,Buffer,1) != HAL_OK )return -1;/*Set Prog Sectors Opcode*/
     
     Buffer[0]=(SectorNum & FTP_CUST_SECT) |FTP_CUST_PWR |FTP_CUST_RST_N | FTP_CUST_REQ;
