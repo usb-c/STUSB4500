@@ -87,7 +87,8 @@ void SystemClock_Config(void);
 /* Private function prototypes -----------------------------------------------*/
 void push_button_Action_PdoChangeDemo(void);
 void CheckUsbPdCommunicationEnded(void);
-void CableDetection(void);
+int CableDetectionPrint(void);
+void CableDetection2(void);
 
 STUSB_GEN1S_RDO_REG_STATUS_RegTypeDef Nego_RDO;
 int PB_press=0;
@@ -189,29 +190,8 @@ int main(void)
   }
 #endif
   
-  int CableAttachedStatus = 0;
-  
-  {
-    printf("\r\n=== CABLE: ");
-    
-    if(CableAttachedStatus = CheckCableAttached() >= 1) //USB-C cable attached
-    {
-      if( CableAttachedStatus == 1)
-      {
-        printf("Attached [CC1] ");
-      }
-      else if( CableAttachedStatus == 2)
-      {
-        printf("Attached [CC2] ");
-      }
-    }
-    else
-    {
-      printf("Not-attached ");
-    }
-    
-    printf("\r\n");
-  }
+
+  int CableAttachedStatus = CableDetectionPrint();
   
   if(CableAttachedStatus >= 1)
   {
@@ -289,7 +269,7 @@ int main(void)
     PostProcess_UsbEvents();
     
 #elif USBC_POLLING_MODE
-    CableDetection();
+    CableDetection2();
     CheckUsbPdCommunicationEnded();
 #endif
     
@@ -314,7 +294,34 @@ int main(void)
   
 }
 
-void CableDetection(void)
+int CableDetectionPrint(void)
+  {
+    int CableAttachedStatus = 0;
+    
+    printf("\r\n=== CABLE: ");
+    
+    if(CableAttachedStatus = CheckCableAttached() >= 1) //USB-C cable attached
+    {
+      if( CableAttachedStatus == 1)
+      {
+        printf("Attached [CC1] ");
+      }
+      else if( CableAttachedStatus == 2)
+      {
+        printf("Attached [CC2] ");
+      }
+    }
+    else
+    {
+      printf("Not-attached ");
+    }
+    
+    printf("\r\n");
+    return CableAttachedStatus;
+  }
+
+//check previous attachement status, to avoid unecessary printf
+void CableDetection2(void)
 {
   int CableAttachedStatus = 0;
   static int CableAttachedStatus_previous = 0;
@@ -351,19 +358,6 @@ void CheckUsbPdCommunicationEnded(void)
   int CableAttachedStatus = 0;
   static int UsbPdCommunicationEnded_Flag = 0;
   
-  
-#if DEBUG
-//  {
-//    uint8_t Data;
-//    int UsbPort=0;
-//    I2C_Read_USB_PD(STUSB45DeviceConf[UsbPort].I2cBus,STUSB45DeviceConf[UsbPort].I2cDeviceID_7bit, STUSB_PE_FSM_STATE, &Data, 1); 
-//    
-//    if(Data != 0)
-//    {
-//      printf("0x%X|", Data);
-//    }
-//  }
-#endif
   
   if( (CableAttachedStatus = CheckCableAttached() >= 1) //USB-C cable attached
      && (UsbPdCommunicationEnded_Flag == 0) ) //to print only once after connection
