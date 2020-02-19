@@ -59,11 +59,12 @@
 
 #define BUTTON_ACTION1 1
 //#define BUTTON_ACTION2 1
+//#define DEMO_PDO_ROLLING 1
 
 #define USE_RESET_PIN
-//#define USE_RESET_SWRESET
+//#define USE_SWRESET
 
-//#define DEMO_PDO_ROLLING
+
 
 
 
@@ -116,7 +117,6 @@ int main(void)
   uint8_t Cut[USBPORT_MAX];
   int Usb_Port = 0;
   int Status;
-  //uint8_t Prev_Connection_status;
   
   /* USER CODE END 1 */
   
@@ -190,7 +190,7 @@ int main(void)
   }
 #endif
   
-
+  
   int CableAttachedStatus = CableDetectionPrint();
   
   if(CableAttachedStatus >= 1)
@@ -219,7 +219,7 @@ int main(void)
     Status = I2C_Read_USB_PD(STUSB45DeviceConf[Usb_Port].I2cBus,STUSB45DeviceConf[Usb_Port].I2cDeviceID_7bit, REG_DEVICE_ID, &Cut[Usb_Port], 1 );
 #endif
   }
-#endif    
+#endif
   
   if(CableAttachedStatus >= 1)
   {
@@ -253,11 +253,14 @@ int main(void)
   }
   
   Read_SNK_PDO(Usb_Port);
-  
-  Time_elapse = PDO_SNK_NUMB[Usb_Port];
   Print_SNK_PDO(Usb_Port);
-  //Prev_Connection_status = 0;
-  push_button_Action_Flag[Usb_Port]=0;
+  
+#ifdef DEMO_PDO_ROLLING
+  Time_elapse = PDO_SNK_NUMB[Usb_Port];
+#endif
+  
+  push_button_Action_Flag[Usb_Port]=0; //clear
+  
   /* USER CODE END 2 */
   
   /* Infinite loop */
@@ -295,30 +298,30 @@ int main(void)
 }
 
 int CableDetectionPrint(void)
+{
+  int CableAttachedStatus = 0;
+  
+  printf("\r\n=== CABLE: ");
+  
+  if(CableAttachedStatus = CheckCableAttached() >= 1) //USB-C cable attached
   {
-    int CableAttachedStatus = 0;
-    
-    printf("\r\n=== CABLE: ");
-    
-    if(CableAttachedStatus = CheckCableAttached() >= 1) //USB-C cable attached
+    if( CableAttachedStatus == 1)
     {
-      if( CableAttachedStatus == 1)
-      {
-        printf("Attached [CC1] ");
-      }
-      else if( CableAttachedStatus == 2)
-      {
-        printf("Attached [CC2] ");
-      }
+      printf("Attached [CC1] ");
     }
-    else
+    else if( CableAttachedStatus == 2)
     {
-      printf("Not-attached ");
+      printf("Attached [CC2] ");
     }
-    
-    printf("\r\n");
-    return CableAttachedStatus;
   }
+  else
+  {
+    printf("Not-attached ");
+  }
+  
+  printf("\r\n");
+  return CableAttachedStatus;
+}
 
 //check previous attachement status, to avoid unecessary printf
 void CableDetection2(void)
@@ -599,6 +602,7 @@ void push_button_DebugIrq(void)
 }
 
 
+#if BUTTON_ACTION2
 
 void push_button_Action_PdoChangeDemo(void)
 {
@@ -660,8 +664,9 @@ void push_button_Action_PdoChangeDemo(void)
   }
 #endif
   
-  push_button_Action_Flag[Usb_Port] = 0 ;
+  push_button_Action_Flag[Usb_Port] = 0 ; //clear
 }
+#endif
 
 void push_button_Action_SelectNextPdo(void)
 {
@@ -683,8 +688,11 @@ void push_button_Action_SelectNextPdo(void)
   Print_SNK_PDO(Usb_Port);
   
   
-  push_button_Action_Flag[Usb_Port] = 0 ;
+  push_button_Action_Flag[Usb_Port] = 0 ; //clear
 }
+
+
+#ifdef DEMO_PDO_ROLLING
 
 void Timer_Action(void)
 {
@@ -785,7 +793,7 @@ void Timer_Action(void)
   
   Timer_Action_Flag[Usb_Port] = 0 ;
 }
-
+#endif
 
 
 
