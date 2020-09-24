@@ -1,16 +1,16 @@
 # STUSB4500 SW drivers and tools (USB Power Delivery)
-Autonomous USB-C PD controller for Power Sinks / UFP (i.e. on the Devices side) <br/>
-Simple solution for Barrel Connector Replacement, using instead a universal USB connector.
+Autonomous USB-C PD controller for Power Sinks / UFP (i.e. on the device's side) <br/>
+Simple solution for barrel connector replacement, using instead a universal USB connector.
 Certified by USB-IF consortium for USB Type-C and USB Power Delivery applications (USB-C & USB PD). <br/>
 
 ## Application summary
-By default a USB Type-C port on your hardware can get only 5V from a USB-PD Power Source (Host / DFP) <br/>
-This product enables to automatically negociate with the Source a higher Voltage (>5V) up to 100W (20V@5A). <br/>
-For instance, if the Power brick can provide 4 power profiles (5V, 9V, 15V and 20V), then the STUSB4500 will request the highest voltage available (20V). <br/>
-Another example, if the Power brick can provide 4 power profiles (5V, 9V, 15V and 20V) but the Application needs 9V to boot, then the STUSB4500 can be programmed to always request 9V. <br/>
+By default, a USB Type-C port on your hardware can get only 5V from a USB-PD Power Source (Host / DFP) <br/>
+This product enables to automatically negotiate a higher voltage from the source (>5V) up to 100W (20V@5A). <br/>
+For instance, if the power brick can provide 4 power profiles (5V, 9V, 15V and 20V), then the STUSB4500 will request the highest voltage available (20V). <br/>
+Another example, if the power brick can provide 4 power profiles (5V, 9V, 15V and 20V) but the Application needs 9V to boot, then the STUSB4500 can be programmed to always request 9V. <br/>
 This part can be easily implemented in a battery charger with USB-C input in the application.
 
-The device doesn't need any software to run (it is automous). But it is possible to connect to this device by I2C to take control over the default device behavior, or to get the power information (Voltage/Current) of the attached power source at the other side of the cable. This is what is showed in the demo source code of the project's repository (firmware_src).
+The device doesn't need any software to run (it is autonomous), but it is possible to connect to this device by I2C to take control over the default device behavior, or to get the power information (Voltage/Current) of the attached power source at the other side of the cable. This is what is shown in the demo source code of the project's repository (`firmware_src`).
 
 Info:
 ----------------
@@ -18,10 +18,10 @@ Info:
 * __Manufacturer:__ STMicroelectronics
 * __Typical Application:__ To get automatically higher power on Vbus at the insertion of USB-C cable.
 * __USB power role:__ Power SINK
-* __USB data  role:__ independant (works with No Data, or with UFP (USB Device) that can be USB2.0 or USB3.1)   <br />
+* __USB data  role:__ Independent (works with no data, or with UFP (USB Device) that can be USB2.0 or USB3.1)   <br />
 Note: If using the USB-C connector for both Power and Data (with STUSB4500 controller for Power communication on one side, and a USB Data controller on the other side), then the USB-C specification requires for a Power Sink application, that its initial data role (at cable attachment) is always UFP (Device).  <br />
 Similarly, the initial data role of a Power Source application is always DFP (Host). <br />
-To change the role, it is needed to send a USB PD command: PowerRole_Swap or DataRole_Swap.
+To change the role, it is needed to send a USB PD command: `PowerRole_Swap` or `DataRole_Swap`.
 
 * __Features:__ Autonomous, configurable, easy to use, small footprint <br />
 * __Operating supply:__ 5V to 20V directly from Vbus of the USB-C cable. <br /> Or a lower power (3.3V) for battery supplied applications <br />
