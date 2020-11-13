@@ -124,6 +124,22 @@ https://www.st.com/content/st_com/en/products/evaluation-tools/solution-evaluati
 <img src="https://raw.githubusercontent.com/usb-c/STUSB4500/master/Pics/en.stref-scs001v1_image.JPG" width="200">
 </p>
 
+
+* SparkFun Power Delivery Board - USB-C (Qwiic)   <br/>
+https://www.sparkfun.com/products/15801 <br/>
+https://learn.sparkfun.com/tutorials/power-delivery-board---usb-c-qwiic-hookup-guide <br/>
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/usb-c/STUSB4500/master/Pics/board_SparkFun_Power_Delivery_Board_-_USB-C__Qwiic.jpg" width="250">
+</p>
+
+* Tindie fpx: easy USB-C power for all your devices   <br/>
+https://www.tindie.com/products/oxplot/fpx-easy-usb-c-power-for-all-your-devices/
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/usb-c/STUSB4500/master/Pics/board_tindie_fpx_01.jpg" width="200">
+</p>
+
 * Nano USB PD to DC Module : CG-NANOPDDC   <br/>
 https://www.coolgear.com/product/nano-usb-pd-to-dc-module-pd-negotiation-device
 
@@ -150,6 +166,15 @@ alt="IMAGE ALT TEXT HERE" width="350" border="10" /></a>
 alt="IMAGE ALT TEXT HERE" width="350" border="10" /></a>
 </p>
 
+<p align="center">
+ </p>
+ 
+<p align="center">
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=vA1g3bFdDzo
+" target="_blank"><img src="http://img.youtube.com/vi/vA1g3bFdDzo/0.jpg" 
+alt="IMAGE ALT TEXT HERE" width="350" border="10" /></a>
+</p>
+
 <!---
 [![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/YOUTUBE_VIDEO_ID_HERE/0.jpg)](http://www.youtube.com/watch?v=YOUTUBE_VIDEO_ID_HERE)
 --->
@@ -162,13 +187,16 @@ Plenty of scenarios are possible, for instance:  <br/>
 
 | Source ctrl   | USB-C cable   |  Sink ctrl |
 |-----------|:---------------:|----------:|
-| STUSB47x0 |   <---------->  |   STUSB45 |
-| STUSB1600 |   <---------->  |   STUSB45 |
-| STUSB1700 |   <---------->  |   STUSB45 |
-| STUSB1602 + STM32Fx |   <---------->  |   STUSB45 |
-| STUSB1702 + SPC58 |   <---------->  |   STUSB45 |
-| STM32G0xx |   <---------->  |   STUSB45 |
-| STUSB47x0 |   <---------->  | STM32Fx + STUSB45 |
-| STUSB47x0 |   <---------->  | STM32MP1 + STUSB45 |
-| STM32MP1 + STUSB1600 |   <---------->  |   STUSB45 |
+| STUSB47x0 |   <---------->  |   STUSB4500 |
+| STUSB1600 |   <---------->  |   STUSB4500 |
+| STUSB1700 |   <---------->  |   STUSB4500 |
+| STUSB1602 + STM32Fx |   <---------->  |   STUSB4500 |
+| STUSB1702 + SPC58 |   <---------->  |   STUSB4500 |
+| STM32G0xx |   <---------->  |   STUSB4500 |
+| STUSB47x0 |   <---------->  | STM32Fx + STUSB4500 |
+| STUSB47x0 |   <---------->  | STM32MP1 + STUSB4500 |
+| STM32MP1 + STUSB1600 |   <---------->  |   STUSB4500 |
+| Any USB-C Source |   <---------->  |   STUSB4500 |
+| Any USB PD Source |   <---------->  |   STUSB4500 |
+
 
