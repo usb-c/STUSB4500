@@ -26,7 +26,7 @@ To change the role, it is needed to send a USB PD command: `PowerRole_Swap` or `
 * __Features:__ Autonomous, configurable, easy to use, small footprint <br />
 * __Operating supply:__ 5V to 20V directly from Vbus of the USB-C cable. <br /> Or a lower power (3.3V) for battery supplied applications <br />
 * __Power Consumption:__ 140 uA only <br />
-* __Package:__ QFN-24, WLCSP MSL1 <br />
+* __Package:__ QFN-24 (Quad-Flat No-leads), WLCSP (Wafer Level Chip Scale Package) <br />
 * __Part number:__ STUSB4500QTR, STUSB4500BJR
 * __USB Spec:__ USB Type-C v1.2 , USB PD v2.0 & v3.0
 
@@ -180,7 +180,7 @@ alt="IMAGE ALT TEXT HERE" width="350" border="10" /></a>
 --->
 
 ## Notes
-The STUSB45 is a standalone USB-C PD controller for UFP only (Power SINK). <br/>
+The STUSB4500 is a standalone USB-C PD controller for UFP only (Power SINK). <br/>
 Its counter part for DFP only (Power SOURCE) is STUSB47. <br/>
 Because these 2 devices have been certified by USB-IF, it means they are interoperable with any USB-C PD application on the market. <br/>
 Plenty of scenarios are possible, for instance:  <br/>
