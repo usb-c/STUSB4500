@@ -1,6 +1,6 @@
 # STUSB4500 SW drivers and tools (USB Power Delivery)
 Autonomous USB-C PD controller for Power Sinks / UFP (i.e. on the device's side) <br/>
-Simple solution for barrel connector replacement, using instead a universal USB connector.
+Simple solution for barrel connector replacement, by using instead a universal USB connector. <br/>
 Certified by USB-IF consortium for USB Type-C and USB Power Delivery applications (USB-C & USB PD). <br/>
 
 ## Application summary
@@ -14,7 +14,7 @@ The device doesn't need any software to run (it is autonomous), but it is possib
 
 Info:
 ----------------
-* __Device:__       STUSB4500 -> USB PD controller  <br />
+* __Device:__       STUSB4500  USB PD controller  <br />
 * __Manufacturer:__ STMicroelectronics
 * __Typical Application:__ To get automatically higher power on Vbus at the insertion of USB-C cable.
 * __USB power role:__ Power SINK
