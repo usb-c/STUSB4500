@@ -31,14 +31,14 @@ To change the role, it is needed to send a USB PD command: `PowerRole_Swap` or `
 * __USB Spec:__ USB Type-C v1.2 , USB PD v2.0 & v3.0
 
 ## Presentation
-The STUSB4500 is a USB power delivery controller that addresses sink devices. It implements a proprietary algorithm to allow the negotiation of a power delivery contract with a source without MCU support (auto-run mode). PDO profiles are configured in an integrated non-volatile memory. <br/>
+The STUSB4500 is a USB Power Delivery controller (USB PD) that addresses sink devices. It implements a proprietary algorithm to allow the negotiation of a power delivery contract with a USB PD source without MCU support (auto-run mode). PDO profiles are configured in an integrated non-volatile memory (NVM). <br/>
 
 The device supports dead battery mode and is suited for sink devices powered from dead battery state and requiring high power charging profile to be fully operational. <br/>
 
 Thanks to its 20 V technology, it implements high voltage features to protect the CC pins against short-circuits to VBUS up to 22 V and to support high voltage on the VBUS pins directly connected to the VBUS power path up to 28 V. <br/>
 
 ## Key Features
-* Auto-run Type-C™ and USB PD sink controller
+* Auto-run USB Type-C™ and USB PD sink controller
 * Dead battery mode support
 * Up to 3 sink PDO configurable profiles
 * Dual high power charging path support
@@ -48,8 +48,8 @@ Thanks to its 20 V technology, it implements high voltage features to protect th
 * Short-to-VBUS protections on CC pins (22 V)
 * High voltage capability on VBUS pins (28 V)
 * Dual power supply (VSYS and/or VDD):
-  * VSYS = [3.0 V; 5.5 V]
   * VDD = [4.1 V; 22 V]
+  * or VSYS = [3.0 V; 5.5 V]
 * Debug accessory mode support
 * Temperature range: -40 °C up to 105 °C
 * ESD: 3 kV HBM - 1.5 kV CDM
