@@ -111,7 +111,7 @@ Note that the GUI can be used offline for the parameters selection (i.e. without
 
 * Power + Data
   * Case 3: Power (5V to 20V) + Data (USB 2.0) with Microcontroller & external USB2 controller
-  * Case 4: Power (5V to 20V) + Data (USB 3.0) with STM32 Microcontroller
+  * Case 4: Power (5V to 20V) + Data (USB 2.0 FullSpeed) with STM32 Microcontroller
 <p align="center">
 <img src="https://raw.githubusercontent.com/usb-c/STUSB4500/master/Pics/BlockDiagram/Implementation_STUSB4500_Case3.PNG" width="400">
 <img src="https://raw.githubusercontent.com/usb-c/STUSB4500/master/Pics/BlockDiagram/Implementation_STUSB4500_Case4.PNG" width="400">
@@ -122,6 +122,11 @@ Note that the GUI can be used offline for the parameters selection (i.e. without
 <p align="center">
 <img src="https://raw.githubusercontent.com/usb-c/STUSB4500/master/Pics/BlockDiagram/Implementation_STUSB4500_Case5.PNG" width="400">
 </p>
+
+* Power + SuperSpeed Data
+  * Case 6: Power (5V to 20V) + Data (USB 3.1) with Microcontroller & external USB3 controller PHY  <br/>
+For USB3.0, USB3.1 and USB3.2 data speed, connect the SuperSpeed lines: SSTX+/- and SSRX+/-
+
 
 ## Evaluation Boards
 There are different boards available to test the product.
