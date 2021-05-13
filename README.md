@@ -10,11 +10,11 @@ For instance, if the power brick can provide 4 power profiles (5V, 9V, 15V and 2
 Another example, if the power brick can provide 4 power profiles (5V, 9V, 15V and 20V) but the Application needs 9V to boot, then the STUSB4500 can be programmed to always request 9V. <br/>
 This part can be easily implemented in a battery charger with USB-C input in the application.
 
-The device doesn't need any software to run (it is autonomous), but it is possible to connect to this device by I2C to take control over the default device behavior, or to get the power information (Voltage/Current) of the attached power source at the other side of the cable. This is what is shown in the demo source code of the project's repository (`firmware_src`).
+The device doesn't need any software to run (it is autonomous), but it is possible to connect to this device by I2C to take control over the default device behavior, or to get the power information (Voltage/Current) of the attached power source at the other side of the cable. This is what is shown in the demo source code of the project's repository  ([`stusb4500_firmware_src`](Firmware/Project/Src)).
 
 Info:
 ----------------
-* __Device:__       STUSB4500  USB PD controller  <br />
+* __Device:__       STUSB4500  USB Type-C & USB PD controller  <br />
 * __Manufacturer:__ STMicroelectronics
 * __Typical Application:__ To get automatically higher power on Vbus at the insertion of USB-C cable.
 * __USB power role:__ Power SINK
@@ -67,7 +67,7 @@ To simplify the implementation, Use the firmware example contained in this repos
 You can for instance with the MCU request any PDO that you want from the DFP (you are no more limited to 3 PDOs).
 
 Link: [Source code for this project](Firmware/Project/Src)  <br/>
-Link: [Firmware readme](Firmware/readme.md)  <br/>
+Additional information: [Firmware readme](Firmware/readme.md)  <br/>
 
 ### NVM programming
 The chip can be used in standalone with a custom configuration thanks to its internal memory.  <br/>
