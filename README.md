@@ -100,6 +100,29 @@ Note that the GUI can be used offline for the parameters selection (i.e. without
 1. Reset the chip so that it reloads its latest NVM configuration
 
 
+## Block Diagram
+* Power only
+  * Case 1: Power (5V to 20V)
+  * Case 2: Power (5V to 20V) with Microcontroller
+<p align="center">
+<img src="https://raw.githubusercontent.com/usb-c/STUSB4500/master/Pics/BlockDiagram/Implementation_STUSB4500_Case1.PNG" width="400"> 
+<img src="https://raw.githubusercontent.com/usb-c/STUSB4500/master/Pics/BlockDiagram/Implementation_STUSB4500_Case2.PNG" width="400">
+</p>
+
+* Power + Data
+  * Case 3: Power (5V to 20V) + Data (USB 2.0) with Microcontroller & external USB2 controller
+  * Case 4: Power (5V to 20V) + Data (USB 3.0) with STM32 Microcontroller
+<p align="center">
+<img src="https://raw.githubusercontent.com/usb-c/STUSB4500/master/Pics/BlockDiagram/Implementation_STUSB4500_Case3.PNG" width="400">
+<img src="https://raw.githubusercontent.com/usb-c/STUSB4500/master/Pics/BlockDiagram/Implementation_STUSB4500_Case4.PNG" width="400">
+</p>
+
+* Power + Data
+  * Case 5: Power (5V to 20V) + Data (USB 2.0) [without Microcontroller]
+<p align="center">
+<img src="https://raw.githubusercontent.com/usb-c/STUSB4500/master/Pics/BlockDiagram/Implementation_STUSB4500_Case5.PNG" width="400">
+</p>
+
 ## Evaluation Boards
 There are different boards available to test the product.
 
