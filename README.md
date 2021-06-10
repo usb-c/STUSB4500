@@ -21,7 +21,7 @@ Info:
 * __USB data  role:__ Independent (works with no data, or with UFP (USB Device) that can be USB2.0 or USB3.1)   <br />
 Note: If using the USB-C connector for both Power and Data (with STUSB4500 controller for Power communication on one side, and a USB Data controller on the other side), then the USB-C specification requires for a Power Sink application, that its initial data role (at cable attachment) is always UFP (Device).  <br />
 Similarly, the initial data role of a Power Source application is always DFP (Host). <br />
-To change the role, it is needed to send a USB PD command: `PowerRole_Swap` or `DataRole_Swap`.
+To change the role, it is needed to send a USB PD command: `PowerRole_Swap` or `DataRole_Swap`. (command not supported by STUSB4500)
 
 * __Features:__ Autonomous, configurable, easy to use, small footprint <br />
 * __Operating supply:__ 5V to 20V directly from Vbus of the USB-C cable. <br /> Or a lower power (3.3V) for battery supplied applications <br />
