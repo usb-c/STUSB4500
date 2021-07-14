@@ -1,4 +1,4 @@
-# STUSB4500 SW drivers and tools (USB Power Delivery)
+# STUSB4500 SW drivers and tools (USB-C Power Delivery)
 Autonomous USB-C PD controller for Power Sinks / UFP (i.e. on the device's side) <br/>
 Simple solution for barrel connector replacement, by using instead a universal USB connector. <br/>
 Certified by USB-IF consortium for USB Type-C and USB Power Delivery applications (USB-C & USB PD). <br/>
@@ -145,8 +145,8 @@ Before using the GUI with these boards, flash the STM32 with the corresponding b
 <img src="https://raw.githubusercontent.com/usb-c/STUSB4500/master/Pics/en.nucleo-G0.jpg" width="200">
 </p>
 
-* STUSB4500 reference design : STREF-SCS001V1   <br/>
-https://www.st.com/content/st_com/en/products/evaluation-tools/solution-evaluation-tools/psu-and-converter-solution-eval-boards/stref-scs001v1.html
+* STUSB4500 mini eval-board : EVAL-SCS001V1   <br/>
+https://www.st.com/content/st_com/en/products/evaluation-tools/solution-evaluation-tools/psu-and-converter-solution-eval-boards/eval-scs001v1.html
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/usb-c/STUSB4500/master/Pics/en.stref-scs001v1_image.JPG" width="200">
