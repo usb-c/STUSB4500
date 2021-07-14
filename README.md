@@ -134,10 +134,10 @@ There are different boards available to test the product.
 * STUSB4500 evaluation board : STEVAL-ISC005V1   <br/>
 https://www.st.com/content/st_com/en/products/evaluation-tools/solution-evaluation-tools/psu-and-converter-solution-eval-boards/steval-isc005v1.html
 
-  * Note : This board requires to be connected on top of a STM32 Nucleo board : NUCLEO-F072RB or NUCLEO-G071RB <br/>
+  * Note : To use the GUI for configuration, This board requires to be connected on top of a STM32 Nucleo board : NUCLEO-F072RB or NUCLEO-G071RB <br/>
 https://www.st.com/en/evaluation-tools/nucleo-f072rb.html <br/>
 https://www.st.com/en/evaluation-tools/nucleo-g071rb.html <br/>
-To use the GUI with these boards, flash the STM32 with the corresponding binary file.  <br/>
+Before using the GUI with these boards, flash the STM32 with the corresponding binary file.  <br/>
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/usb-c/STUSB4500/master/Pics/en.steval-isc005v1_image.jpg" width="200">
